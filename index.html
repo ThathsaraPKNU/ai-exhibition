@@ -3,88 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Finger Counter - Vector Lab AI</title>
+    <title>AI Finger Counter - කිමේ බක්මහ උළෙල 2026</title>
     <style>
-        body { margin: 0; background: #000; color: #00d1b2; text-align: center; font-family: 'Segoe UI', Arial, sans-serif; overflow: hidden; }
-        .header { background: #1a1a1a; padding: 15px; border-bottom: 3px solid #00d1b2; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        #wrapper { position: relative; display: inline-block; margin-top: 15px; border-radius: 15px; border: 4px solid #1a1a1a; overflow: hidden; background: #000; }
-        video { width: 100%; max-width: 640px; transform: scaleX(-1); display: block; }
+        /* --- General Styles --- */
+        body { margin: 0; background: #000; color: #fff; text-align: center; font-family: 'Segoe UI', Arial, sans-serif; overflow: hidden; }
+        
+        /* --- Matrix Loading Screen Styles --- */
+        #loading-screen { position: fixed; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 1s ease-out; }
+        #matrix-canvas { position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0.3; }
+        .loading-text { font-size: 24px; color: #0f0; font-family: 'Courier New', Courier, monospace; z-index: 10; font-weight: bold; text-shadow: 0 0 10px #0f0; }
+        .tech-status { font-size: 14px; color: #888; z-index: 10; margin-top: 10px; font-family: 'Courier New', monospace; }
+
+        /* --- Main App Styles (Hidden initially) --- */
+        #main-app { display: none; opacity: 0; transition: opacity 1.5s ease-in; }
+        
+        /* --- Header Styles --- */
+        .header { background: #111; padding: 15px; border-bottom: 4px solid #ff3e3e; box-shadow: 0 5px 20px rgba(0,0,0,0.8); position: relative; }
+        .event-name { color: #ffdd57; font-weight: bold; font-size: 22px; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 10px #ffdd57; animation: glitch 3s infinite; }
+        .tech-heading { color: #00d1b2; font-size: 18px; margin: 5px 0; font-weight: bold; }
+
+        /* --- Camera Wrapper Styles --- */
+        #wrapper { position: relative; display: inline-block; margin-top: 15px; border-radius: 20px; border: 5px solid #1a1a1a; overflow: hidden; background: #000; box-shadow: 0 0 30px rgba(0, 209, 178, 0.3); }
+        video { width: 100%; max-width: 600px; transform: scaleX(-1); display: block; }
         canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%; transform: scaleX(-1); pointer-events: none; }
-        .footer { margin-top: 10px; font-size: 16px; color: #fff; font-weight: bold; }
-        .sponsor { font-size: 14px; color: #888; margin-top: 5px; }
-        .ai-quote { font-style: italic; color: #00d1b2; margin-bottom: 5px; font-size: 14px; }
+        
+        /* --- Footer Styles --- */
+        .footer { margin-top: 10px; padding: 10px; }
+        .instruction { font-size: 18px; color: #ffdd57; font-weight: bold; background: rgba(255, 221, 87, 0.1); padding: 10px 20px; border-radius: 50px; display: inline-block; border: 2px solid #ff3e3e; margin-bottom: 10px; box-shadow: 0 0 15px rgba(255, 62, 62, 0.4); }
+        #count-display { font-size: 90px; color: #00d1b2; font-weight: bold; text-shadow: 0 0 25px #00d1b2; line-height: 1; margin: 5px 0; }
+        .sponsor { font-size: 12px; color: #666; margin-top: 10px; }
+
+        /* --- Keyframe Animations --- */
+        @keyframes glitch { 0% { text-shadow: 0.5px 0 0 #ffdd57, -0.5px 0 0 #00d1b2; } 2% { text-shadow: 1px 0 0 #ffdd57, -1px 0 0 #00d1b2; } 4% { text-shadow: 0.5px 0 0 #ffdd57, -0.5px 0 0 #00d1b2; } 100% { text-shadow: 0.5px 0 0 #ffdd57, -0.5px 0 0 #00d1b2; } }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h2 style="margin:0; letter-spacing: 1px;">AI FINGER COUNTER</h2>
-        <p class="sponsor">Presents by : Vector Lab AI & E9 Shop</p>
+
+    <div id="loading-screen">
+        <canvas id="matrix-canvas"></canvas>
+        <div class="loading-text">Vector Lab AI පද්ධතිය පණගැන්වේ...</div>
+        <div class="tech-status">Kime Bakmaha Ulele 2026 - AI Module Loading</div>
     </div>
 
-    <div id="wrapper">
-        <video id="webcam" autoplay playsinline muted></video>
-        <canvas id="canvas"></canvas>
-    </div>
+    <div id="main-app">
+        <div class="header">
+            <div class="event-name">🇰🇷 කිමේ බක්මහ උළෙල 2026 🌸</div>
+            <div class="tech-heading">අපි AI පද්ධතියකට ගණන් කිරීමට උගන්වමු</div>
+            <p style="margin:0; color: #888; font-size: 12px;">Presents by : Vector Lab AI & E9 Shop</p>
+        </div>
 
-    <div class="footer">
-        <p class="ai-quote">"AI can now see and count like a human eye!"</p>
-        <div id="count-text" style="font-size: 40px; color: #ffdd57;">අත කැමරාවට පෙන්වන්න...</div>
+        <div id="wrapper">
+            <video id="webcam" autoplay playsinline muted></video>
+            <canvas id="canvas"></canvas>
+        </div>
+
+        <div class="footer">
+            <div class="instruction">✋ ඔබේ ඇඟිලි කැමරාවට පෙන්වන්න</div>
+            <div id="count-display">0</div>
+            <p class="sponsor">Korea Tech Division - Sri Lanka Branch</p>
+        </div>
     </div>
 
     <script src="https://cdn.roboflow.com/0.2.26/roboflow.js"></script>
     <script>
+        // --- DOM Elements ---
         const video = document.getElementById("webcam");
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
-        const countDisplay = document.getElementById("count-text");
+        const countDisplay = document.getElementById("count-display");
+        const loadingScreen = document.getElementById("loading-screen");
+        const mainApp = document.getElementById("main-app");
 
+        // --- Roboflow Configuration ---
         const MY_API_KEY = "rf_4tlgDCsTcah7rsFZTkKONHC3TXO2"; 
         const MY_MODEL_ID = "finger-count"; 
         const MY_VERSION = 2;
 
-        navigator.mediaDevices.getUserMedia({ 
-            video: { facingMode: "user", width: 640, height: 480 } 
-        })
-        .then(stream => {
-            video.srcObject = stream;
-            video.onloadedmetadata = () => {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                startAI();
-            };
+        // --- Matrix Code Rain Effect ---
+        const matrixCanvas = document.getElementById('matrix-canvas');
+        const mctx = matrixCanvas.getContext('2d');
+        matrixCanvas.width = window.innerWidth;
+        matrixCanvas.height = window.innerHeight;
+        const matrixChars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const drops = [];
+        const fontSize = 16;
+        const columns = matrixCanvas.width / fontSize;
+        for (let i = 0; i < columns; i++) drops[i] = 1;
+        
+        function drawMatrix() {
+            mctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            mctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+            mctx.fillStyle = '#0f0';
+            mctx.font = fontSize + 'px monospace';
+            for (let i = 0; i < drops.length; i++) {
+                const text = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+                mctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > matrixCanvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        let matrixInterval = setInterval(drawMatrix, 35);
+
+        // --- Launch Sequence ---
+        window.addEventListener('load', () => {
+            console.log("App Loaded. Starting Launch Sequence...");
+            // Simulate AI Activation
+            setTimeout(() => {
+                // Fade out loading screen
+                loadingScreen.style.opacity = '0';
+                clearInterval(matrixInterval); // Stop matrix to save resources
+                
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    mainApp.style.display = 'block';
+                    // Fade in main app
+                    setTimeout(() => mainApp.style.opacity = '1', 50);
+                    // Initialize Camera and AI
+                    initApp();
+                }, 1000); // Wait for fade out to complete
+            }, 3000); // Show matrix for 3 seconds
         });
 
+        // --- Initialize Camera and AI ---
+        function initApp() {
+            navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } } 
+            })
+            .then(stream => {
+                video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    startAI();
+                };
+            })
+            .catch(err => alert("Camera Error: " + err));
+        }
+
+        // --- Start Roboflow AI ---
         function startAI() {
-            roboflow.auth({ publishable_key: MY_API_KEY })
-                .load({ model: MY_MODEL_ID, version: MY_VERSION })
+            console.log("Roboflow Loading...");
+            roboflow.auth({ publishable_key: MY_API_KEY }).load({ model: MY_MODEL_ID, version: MY_VERSION })
                 .then(model => {
+                    console.log("Model Loaded Successfully!");
                     setInterval(() => {
                         model.detect(video).then(predictions => {
                             ctx.clearRect(0, 0, canvas.width, canvas.height);
                             
                             if (predictions.length > 0) {
-                                // වැඩිම විශ්වාසයක් ඇති Prediction එක තෝරාගනී
                                 let topPred = predictions.sort((a,b) => b.confidence - a.confidence)[0];
                                 
                                 predictions.forEach(p => {
-                                    if(p.confidence > 0.4) {
-                                        // අත වටා කොටුව ඇඳීම
-                                        ctx.strokeStyle = "#00d1b2";
-                                        ctx.lineWidth = 6;
+                                    if(p.confidence > 0.45) {
+                                        // Draw Neon Box
+                                        ctx.strokeStyle = "#ff3e3e";
+                                        ctx.lineWidth = 8;
+                                        ctx.lineJoin = "round";
+                                        ctx.shadowBlur = 15;
+                                        ctx.shadowColor = "#ff3e3e";
                                         ctx.strokeRect(p.bbox.x, p.bbox.y, p.bbox.width, p.bbox.height);
-                                        
-                                        // අංකය ඇඳීම
-                                        ctx.fillStyle = "#00d1b2";
-                                        ctx.font = "bold 45px Arial";
-                                        ctx.fillText(p.class, p.bbox.x, p.bbox.y - 15);
+                                        ctx.shadowBlur = 0; // Reset shadow
+
+                                        // Draw Label with Background
+                                        ctx.fillStyle = "#ff3e3e";
+                                        ctx.fillRect(p.bbox.x, p.bbox.y - 40, 50, 40);
+                                        ctx.fillStyle = "#fff";
+                                        ctx.font = "bold 30px Arial";
+                                        ctx.fillText(p.class, p.bbox.x + 15, p.bbox.y - 10);
                                     }
                                 });
 
-                                if(topPred.confidence > 0.4) {
-                                    countDisplay.innerHTML = "අතේ ඇඟිලි ගණන: " + topPred.class;
+                                if(topPred.confidence > 0.45) {
+                                    countDisplay.innerHTML = topPred.class;
+                                    countDisplay.style.color = "#ffdd57"; // Highlight on count
                                 }
                             } else {
-                                countDisplay.innerHTML = "කැමරාවට අත පෙන්වන්න";
+                                countDisplay.innerHTML = "0";
+                                countDisplay.style.color = "#00d1b2";
                             }
                         });
                     }, 200);
