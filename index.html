@@ -24,7 +24,7 @@
         <canvas id="canvas"></canvas>
     </div>
 
-    <div class="footer">මුහුණ කැමරාවට පෙන්වන්න | Point your face to the camera</div>
+    <div class="footer">කැමරාවට මුහුණ පෙන්වන්න | Show your face to the camera</div>
 
     <script src="https://cdn.roboflow.com/0.2.26/roboflow.js"></script>
     <script>
@@ -32,25 +32,29 @@
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
 
-        // ඔබේ තොරතුරු
+        // ඔබේ තොරතුරු (ඔබේ නව Model එක අනුව)
         const MY_API_KEY = "rf_4tlgDCsTcah7rsFZTkKONHC3TXO2"; 
-        const MY_MODEL_ID = "facial-emotion-recognition";
+        const MY_MODEL_ID = "facial-emotion-recognition"; // uni-o612z ව්‍යාපෘතිය
         const MY_VERSION = 2;
 
-        // මෙම Model එකේ නිවැරදි Classes (FER v2)
+        // Dataset එකට අනුව Classes (සිංහල සහ ඉංග්‍රීසි භාෂා දෙකෙන්ම)
         const emotions = { 
             "angry": "ANGRY 😡 තරහෙන්", 
-            "disgust": "DISGUST 🤮 අප්‍රසන්න", 
-            "fear": "FEAR 😨 බයෙන්", 
             "happy": "HAPPY 😊 සතුටින්", 
-            "neutral": "NEUTRAL 😐 සාමාන්‍යයි", 
-            "sad": "SAD 😔 කණගාටුයි", 
-            "surprise": "SURPRISE 😲 පුදුමයි" 
+            "sad": "SAD 😔 කණගාටුයි",
+            "neutral": "NEUTRAL 😐 සාමාන්‍යයි",
+            "surprise": "SURPRISE 😲 පුදුමයි",
+            "fear": "FEAR 😨 බයෙන්",
+            "disgust": "DISGUST 🤮 අප්‍රසන්න"
         };
 
-        // කැමරාව සක්‍රිය කිරීම (Front Camera selection added)
+        // ජංගම දුරකථනයේ ඉදිරිපස කැමරාව (facingMode: "user") සක්‍රිය කිරීම
         navigator.mediaDevices.getUserMedia({ 
-            video: { facingMode: "user", width: 640, height: 480 } 
+            video: { 
+                facingMode: "user", 
+                width: { ideal: 640 }, 
+                height: { ideal: 480 } 
+            } 
         })
         .then(stream => {
             video.srcObject = stream;
@@ -60,38 +64,45 @@
                 startAI();
             };
         })
-        .catch(err => alert("Camera Error: " + err));
+        .catch(err => {
+            console.error("Camera Error:", err);
+            alert("කැමරාව ලබා ගැනීමට නොහැක. කරුණාකර අවසර ලබා දෙන්න.");
+        });
 
         function startAI() {
+            console.log("Roboflow Loading...");
             roboflow.auth({ publishable_key: MY_API_KEY })
                 .load({ model: MY_MODEL_ID, version: MY_VERSION })
                 .then(model => {
-                    console.log("AI Model Loaded Successfully!");
+                    console.log("Model Loaded Successfully!");
                     setInterval(() => {
                         model.detect(video).then(predictions => {
                             ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            
                             predictions.forEach(p => {
-                                if(p.confidence > 0.45) { // නිශ්චිත බව 45% ට වැඩි නම් පමණක් පෙන්වන්න
-                                    // කොටුව (Bounding Box)
+                                // Confidence මට්ටම 40% ට වැඩි නම් පමණක් පෙන්වන්න
+                                if(p.confidence > 0.40) { 
+                                    // කොටුව ඇඳීම
                                     ctx.strokeStyle = "#00d1b2";
-                                    ctx.lineWidth = 5;
+                                    ctx.lineWidth = 6;
                                     ctx.strokeRect(p.bbox.x, p.bbox.y, p.bbox.width, p.bbox.height);
 
-                                    // පසුබිම සහිත ලේබලය (Label with Background)
+                                    // පසුබිම සහිත ලේබලය ඇඳීම
                                     const label = emotions[p.class] || p.class;
-                                    ctx.font = "bold 24px Arial";
+                                    ctx.font = "bold 28px Arial";
                                     const textWidth = ctx.measureText(label).width;
                                     
                                     ctx.fillStyle = "#00d1b2";
-                                    ctx.fillRect(p.bbox.x, p.bbox.y - 40, textWidth + 10, 35);
+                                    ctx.fillRect(p.bbox.x, p.bbox.y - 45, textWidth + 12, 40);
                                     
                                     ctx.fillStyle = "#000";
-                                    ctx.fillText(label, p.bbox.x + 5, p.bbox.y - 12);
+                                    ctx.fillText(label, p.bbox.x + 6, p.bbox.y - 15);
                                 }
                             });
                         });
-                    }, 200); // සෑම මිලි තත්පර 200 කට වරක්ම පරීක්ෂා කරයි
-                });
+                    }, 200); 
+                })
+                .catch(err => console.error("Model Loading Error:", err));
         }
     </script>
 </body>
