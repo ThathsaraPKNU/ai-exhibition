@@ -3,31 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Emotion Detector</title>
+    <title>AI Emotion Detection</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #121212; color: white; margin: 0; overflow-x: hidden; }
-        .header { background: #1f1f1f; padding: 15px; border-bottom: 3px solid #00d1b2; }
-        .header h1 { margin: 5px 0; font-size: 22px; color: #00d1b2; }
-        #video-container { position: relative; display: inline-block; margin-top: 20px; width: 95%; max-width: 640px; background: #000; border-radius: 10px; }
-        video { width: 100%; border-radius: 10px; display: block; transform: scaleX(-1); }
-        canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%; transform: scaleX(-1); }
-        .footer { margin-top: 15px; font-size: 14px; color: #888; padding: 10px; }
+        body { font-family: sans-serif; text-align: center; background: #121212; color: white; margin: 0; }
+        .header { background: #1f1f1f; padding: 20px; border-bottom: 3px solid #00d1b2; }
+        video { width: 90%; max-width: 600px; border-radius: 10px; margin-top: 20px; transform: scaleX(-1); background: #222; }
+        #container { position: relative; display: inline-block; }
+        canvas { position: absolute; left: 0; top: 20px; width: 100%; height: 100%; transform: scaleX(-1); pointer-events: none; }
     </style>
 </head>
 <body>
-
     <div class="header">
         <h1>AI හැඟීම් හඳුනාගැනීමේ පද්ධතිය</h1>
-        <p style="font-size: 14px; margin: 0; color: #aaa;">නිර්මාණය: Indunil Samayamanthtree</p>
+        <p>නිර්මාණය: Indunil Samayamanthtree</p>
     </div>
 
-    <div id="video-container">
+    <div id="container">
         <video id="webcam" autoplay playsinline muted></video>
         <canvas id="canvas"></canvas>
-    </div>
-
-    <div class="footer">
-        <p>කැමරාව ඉදිරියේ ඔබේ මුහුණේ ඉරියව් වෙනස් කර බලන්න.</p>
     </div>
 
     <script src="https://cdn.roboflow.com/0.2.26/roboflow.js"></script>
@@ -36,65 +29,39 @@
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
 
-        // ඔබේ නිවැරදි දත්ත
         const MY_API_KEY = "vmu1oR7ZaUWJRFP7zeLC"; 
         const MY_MODEL_ID = "emotion-zjj8h/1"; 
 
-        const emotionSinhala = {
-            "0": "සතුටුයි 😊",
-            "1": "කණගාටුයි 😔",
-            "2": "පුදුමයි 😲",
-            "3": "තරහෙන් 😡",
-            "4": "සාමාන්‍යයි 😐"
-        };
+        const emotionSinhala = { "0": "සතුටුයි 😊", "1": "කණගාටුයි 😔", "2": "පුදුමයි 😲", "3": "තරහෙන් 😡", "4": "සාමාන්‍යයි 😐" };
 
-        // කැමරාව පණගැන්වීම
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-                .then(function(stream) {
-                    video.srcObject = stream;
-                    video.onloadedmetadata = () => {
-                        canvas.width = video.videoWidth;
-                        canvas.height = video.videoHeight;
-                        loadAI();
-                    };
-                })
-                .catch(function(err) {
-                    alert("කැමරාව ක්‍රියාත්මක කිරීමට නොහැක: " + err);
-                });
-        }
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+            .then(stream => {
+                video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    startAI();
+                };
+            }).catch(err => alert("කැමරාව වැඩ කරන්නේ නැත: " + err));
 
-        function loadAI() {
-            roboflow.auth({ publishable_key: MY_API_KEY })
-                .load({ model: MY_MODEL_ID, version: 1 })
+        function startAI() {
+            roboflow.auth({ publishable_key: MY_API_KEY }).load({ model: MY_MODEL_ID, version: 1 })
                 .then(model => {
-                    console.log("Model loaded successfully");
+                    console.log("AI Model Ready!");
                     setInterval(() => {
                         model.detect(video).then(predictions => {
-                            draw(predictions);
+                            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            predictions.forEach(p => {
+                                ctx.strokeStyle = "#00d1b2";
+                                ctx.lineWidth = 5;
+                                ctx.strokeRect(p.bbox.x, p.bbox.y, p.bbox.width, p.bbox.height);
+                                ctx.fillStyle = "#00d1b2";
+                                ctx.font = "bold 30px Arial";
+                                ctx.fillText(emotionSinhala[p.class] || p.class, p.bbox.x, p.bbox.y - 10);
+                            });
                         });
                     }, 200);
-                })
-                .catch(err => {
-                    console.error("AI Model error:", err);
                 });
-        }
-
-        function draw(predictions) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            predictions.forEach(p => {
-                const color = "#00d1b2";
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 6;
-                ctx.strokeRect(p.bbox.x, p.bbox.y, p.bbox.width, p.bbox.height);
-
-                const sinhalaText = emotionSinhala[p.class] || p.class;
-                ctx.fillStyle = color;
-                ctx.font = "bold 35px Arial";
-                
-                // Mirror එක නිසා අකුරු හරියට පෙන්වීමට
-                ctx.fillText(sinhalaText, p.bbox.x, p.bbox.y - 15);
-            });
         }
     </script>
 </body>
