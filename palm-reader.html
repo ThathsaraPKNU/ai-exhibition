@@ -23,49 +23,47 @@
 
         header {
             width: 100%;
-            padding: 30px 0;
-            background: linear-gradient(to bottom, #111, transparent);
+            padding: 25px 0;
             text-align: center;
         }
 
         .main-topic {
-            font-size: 38px;
+            font-size: 36px;
             font-weight: 900;
             color: var(--neon-yellow);
-            text-transform: uppercase;
-            letter-spacing: 3px;
             margin: 0;
-            text-shadow: 0 0 20px rgba(255, 221, 87, 0.4);
+            text-shadow: 0 0 15px rgba(255, 221, 87, 0.3);
         }
 
-        /* Main Layout */
-        .main-content {
+        /* Layout Container */
+        .display-wrapper {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: row; /* දකුණු පසට පෙළගැස්වීම */
             justify-content: center;
-            align-items: flex-start;
-            gap: 20px;
+            align-items: stretch;
+            gap: 30px;
             padding: 20px;
-            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        /* Scanner Area */
+        /* Camera Section */
         #container {
             position: relative;
-            border: 5px solid #222;
-            border-radius: 25px;
+            border: 4px solid #222;
+            border-radius: 20px;
             overflow: hidden;
             width: 640px;
             height: 480px;
-            box-shadow: 0 0 40px rgba(0, 242, 255, 0.1);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.1);
         }
 
         video, canvas {
             position: absolute;
             top: 0;
             left: 0;
-            width: 640px;
-            height: 480px;
+            width: 100%;
+            height: 100%;
             transform: scaleX(-1);
         }
 
@@ -82,9 +80,9 @@
 
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
-        /* Results & Side Disclaimer */
-        .side-panel {
-            width: 350px;
+        /* Right Side Panel */
+        .right-info-panel {
+            width: 400px;
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -94,34 +92,48 @@
             background: rgba(255, 221, 87, 0.05);
             border: 2px solid var(--neon-yellow);
             padding: 25px;
-            border-radius: 20px;
-            font-size: 24px;
+            border-radius: 15px;
+            font-size: 22px;
             font-weight: bold;
             color: var(--neon-yellow);
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .scientific-box {
-            background: rgba(255, 255, 255, 0.03);
-            border-left: 5px solid var(--neon-cyan);
-            padding: 20px;
-            border-radius: 0 15px 15px 0;
+        .scientific-fact-box {
+            background: rgba(0, 242, 255, 0.03);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            border-right: 6px solid var(--neon-cyan); /* දකුණු පසින් කැපී පෙනෙන ඉරක් */
+            padding: 25px;
+            border-radius: 15px 0 0 15px;
+            flex-grow: 1;
         }
 
-        .scientific-box h2 {
-            font-size: 22px;
+        .scientific-fact-box h2 {
+            font-size: 24px;
             color: var(--neon-cyan);
             margin-top: 0;
+            margin-bottom: 15px;
             text-transform: uppercase;
         }
 
-        .scientific-box p {
-            font-size: 13px;
+        .scientific-fact-box p {
+            font-size: 14.5px;
             color: #ccc;
-            line-height: 1.7;
+            line-height: 1.8;
             text-align: justify;
             margin: 0;
+        }
+
+        #status-bar {
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+            font-weight: bold;
         }
 
         footer {
@@ -131,12 +143,9 @@
             text-align: center;
         }
 
-        #status {
-            font-weight: bold;
-            letter-spacing: 2px;
-            color: var(--neon-cyan);
-            margin-bottom: 10px;
-            display: block;
+        @media (max-width: 1000px) {
+            .display-wrapper { flex-direction: column; align-items: center; }
+            .right-info-panel { width: 640px; }
         }
     </style>
 </head>
@@ -146,39 +155,39 @@
         <h1 class="main-topic">2026 කිමේ බක්මහ උළෙල</h1>
     </header>
 
-    <div class="main-content">
+    <div class="display-wrapper">
         <div id="container">
             <div id="laser-line"></div>
             <video id="webcam" autoplay playsinline muted></video>
             <canvas id="overlay"></canvas>
         </div>
 
-        <div class="side-panel">
+        <div class="right-info-panel">
             <div>
-                <span id="status">● SYSTEM READY</span>
-                <div id="prediction-text">ඔබේ අනාගතය දැනගැනීමට අල්ල පෙන්වන්න...</div>
+                <span id="status-bar">● AI SYSTEM ACTIVE</span>
+                <div id="prediction-text">අනාගතය දැනගැනීමට අල්ල පෙන්වන්න...</div>
             </div>
 
-            <div class="scientific-box">
+            <div class="scientific-fact-box">
                 <h2>විද්‍යාත්මක සත්‍යය:</h2>
                 <p>
-                    අතේ රේඛා මඟින් අනාගතය 100% ක් නිවැරදිව ප්‍රකාශ කිරීමට මෙතෙක් ලොව කිසිදු තාක්ෂණයකට හැකියාවක් නැත. මෙහිදී අප සිදු කරනු ලබන්නේ පවතින උසස්ම <strong>Palm Detection Model</strong> එකක් භාවිතයෙන් අල්ලේ රේඛා රටා (Patterns) හඳුනාගෙන ඒවා දත්ත පද්ධතියක් සමඟ සංසන්දනය කර ධනාත්මක මගපෙන්වීමක් ලබා දීමයි. මෙවැනි AI පද්ධති තවමත් පර්යේෂණ මට්ටමේ පවතින අතර මෙය හුදෙක් විනෝදාස්වාදය සඳහා පමණක් බව කරුණාවෙන් සලකන්න.
+                    අතේ රේඛා මඟින් අනාගතය 100% ක් නිවැරදිව ප්‍රකාශ කිරීමට මෙතෙක් ලොව කිසිදු තාක්ෂණයකට හැකියාවක් නැත. මෙහිදී අප සිදු කරනු ලබන්නේ පවතින උසස්ම <strong>Palm Detection Model</strong> එකක් භාවිතයෙන් අල්ලේ රේඛා රටා (Patterns) හඳුනාගෙන ඒවා දත්ත පද්ධතියක් සමඟ සංසන්දනය කර ධනාත්මක මගපෙන්වීමක් ලබා දීමයි. 
+                    <br><br>
+                    මෙවැනි AI පද්ධති තවමත් පර්යේෂණ (Training) මට්ටමේ පවතින අතර ඉදිරියේදී වඩාත් නිවැරදි විද්‍යාත්මක දත්ත විශ්ලේෂණයන් ලබා ගැනීමට හැකි වනු ඇත. මෙය හුදෙක් ඔබගේ විනෝදාස්වාදය සඳහා පමණක් බව කරුණාවෙන් සලකන්න.
                 </p>
             </div>
         </div>
     </div>
 
-    <footer>
-        VECTOR LAB AI | 2026 | EXHIBITION PROTOTYPE
-    </footer>
+    <footer>VECTOR LAB AI | 2026 | EXHIBITION PROTOTYPE</footer>
 
     <script src="https://cdn.roboflow.com/0.2.26/roboflow.js"></script>
     <script>
         const video = document.getElementById("webcam");
         const canvas = document.getElementById("overlay");
         const ctx = canvas.getContext("2d");
-        const predictionText = document.getElementById("prediction-text");
-        const statusText = document.getElementById("status");
+        const predictionBox = document.getElementById("prediction-text");
+        const statusText = document.getElementById("status-bar");
         const laser = document.getElementById("laser-line");
 
         const API_KEY = "rf_4tlgDCsTcah7rsFZTkKONHC3TXO2"; 
@@ -213,12 +222,12 @@
                             if (predictions.length > 0) {
                                 const palm = predictions[0];
                                 
-                                // අල්ල වටා සීමා ඉර (Boundary Box) ඇඳීම
+                                // Boundary Box
                                 ctx.strokeStyle = "#00f2ff";
                                 ctx.lineWidth = 4;
                                 ctx.strokeRect(palm.bbox.x, palm.bbox.y, palm.bbox.width, palm.bbox.height);
 
-                                if (palm.confidence > 0.7) {
+                                if (palm.confidence > 0.75) {
                                     startAnalysis(palm.bbox);
                                 }
                             }
@@ -230,21 +239,22 @@
         function startAnalysis(bbox) {
             isAnalyzing = true;
             laser.style.display = "block";
-            statusText.innerHTML = "● ANALYZING...";
-            predictionText.innerHTML = "අල්ල නිසලව තබා ගන්න...";
+            statusText.innerHTML = "● ANALYZING DERMAL PATTERNS...";
+            predictionBox.innerHTML = "අල්ල නිසලව තබා ගන්න...";
 
-            // එකම අතට එකම දේ ලැබීමට bbox අගයන් භාවිතයෙන් hash එකක් සෑදීම
+            // Consistency Hashing (එකම අතට එකම ප්‍රතිඵලය)
             const hashIndex = Math.floor((bbox.x + bbox.y + bbox.width) % fortunes.length);
 
             setTimeout(() => {
-                predictionText.innerHTML = fortunes[hashIndex];
-                statusText.innerHTML = "● COMPLETE";
+                predictionBox.innerHTML = fortunes[hashIndex];
+                statusText.innerHTML = "● ANALYSIS COMPLETE";
                 laser.style.display = "none";
                 
                 setTimeout(() => { 
                     isAnalyzing = false; 
                     statusText.innerHTML = "● SYSTEM READY";
-                }, 10000); // තත්පර 10 කට පසු නැවත සක්‍රිය වේ
+                    predictionBox.innerHTML = "අනාගතය දැනගැනීමට අල්ල පෙන්වන්න...";
+                }, 12000); 
             }, 4000);
         }
     </script>
