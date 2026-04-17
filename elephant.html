@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Elephant Game | 2026</title>
+    <title>කිමේ බක්මහ උළෙල AI</title>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
     
@@ -11,36 +11,45 @@
         :root { --gold: #ffcc00; --neon: #39ff14; --dark: #050505; }
         body { 
             margin: 0; background: var(--dark); color: #fff; 
-            font-family: sans-serif; display: flex; flex-direction: column; 
+            font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; 
             align-items: center; height: 100vh; overflow: hidden;
-            touch-action: none;
         }
-        .main-header {
-            background: var(--gold); color: #000; width: 100%;
-            text-align: center; padding: 12px 0; font-weight: 900; font-size: 1.1rem;
+
+        /* 1. ආකර්ෂණීය ආරම්භක තිරය (Splash Screen) */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--dark); z-index: 1000; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; transition: 0.5s;
         }
-        .instruction-box {
-            background: rgba(57, 255, 20, 0.1); border: 1px solid var(--neon);
-            padding: 10px; margin: 10px; border-radius: 10px; color: var(--neon);
-            font-weight: bold; text-align: center; font-size: 0.85rem;
-        }
-        #game-area {
+        .splash-title { font-size: 2rem; color: var(--gold); font-weight: 900; margin-bottom: 10px; }
+        .splash-sub { font-size: 1.2rem; color: #fff; border-bottom: 2px solid var(--neon); padding-bottom: 5px; }
+        .start-btn { margin-top: 30px; padding: 15px 40px; background: var(--neon); color: #000; border: none; border-radius: 30px; font-weight: bold; font-size: 1.1rem; }
+
+        /* Main UI */
+        .instruction { color: var(--neon); font-size: 0.9rem; margin: 10px; font-weight: bold; text-align: center; }
+
+        /* Game Box - Aspect Ratio Fixed */
+        #game-container {
             position: relative;
-            width: 90vw; height: 50vh; 
-            background: #fff url('image_2.png') no-repeat center;
+            width: 90vw;
+            aspect-ratio: 700 / 500; /* අලියාගේ රූපයේ අනුපාතය */
+            background: #fff url('image_56b09e.jpg') no-repeat center;
             background-size: contain;
             border: 3px solid #444; border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
+
         #target {
             position: absolute;
-            width: 15px; height: 15px;
+            width: 4%; height: 5.5%; /* ප්‍රතිශතයක් ලෙස ඇස තැබිය යුතු තැන */
             background: rgba(255, 0, 0, 0.4);
             border-radius: 50%;
             top: 30.5%; left: 71.5%; 
-            border: 2px dashed red;
+            border: 1.5px dashed red;
             transform: translate(-50%, -50%);
         }
+
         #eye-cursor {
             position: absolute;
             width: 35px; height: 35px;
@@ -48,45 +57,65 @@
             background-size: contain;
             pointer-events: none; z-index: 100; display: none;
         }
-        .status { margin-top: 15px; font-weight: bold; color: var(--gold); font-size: 1rem; text-align: center; padding: 0 10px; }
+
+        /* 2. Highlighted Topic & Sponsorship */
+        .bottom-branding { text-align: center; margin-top: 15px; width: 100%; }
+        .main-topic { font-size: 1.8rem; color: var(--gold); font-weight: 900; text-shadow: 2px 2px 10px rgba(255, 204, 0, 0.4); }
+        .presented-by { font-size: 0.8rem; color: #aaa; margin-top: 5px; letter-spacing: 1px; }
+        .presented-by span { color: #fff; font-weight: bold; }
+
+        .status { margin-top: 10px; font-weight: bold; color: var(--gold); }
         #webcam { display: none; }
-        button {
-            margin-top: 15px; padding: 12px 30px; background: var(--neon);
-            border: none; border-radius: 25px; font-weight: bold; cursor: pointer; display: none;
-        }
+        #res { margin-top: 10px; padding: 10px 25px; background: var(--neon); border: none; border-radius: 20px; font-weight: bold; display: none; }
     </style>
 </head>
 <body>
 
-    <div class="main-header">🌸 කීමේ බක්මහ උළෙල - 2026 🌸</div>
-    <div class="instruction-box">දබර ඇඟිල්ලෙන් ඇස ගෙන ගොස් අලියාට තබන්න!</div>
+    <div id="splash-screen">
+        <div class="splash-title">කිමේ බක්මහ උළෙල - 2026</div>
+        <div class="splash-sub">AI අවුරුදු ක්‍රීඩා</div>
+        <button class="start-btn" onclick="startApp()">ක්‍රීඩාව අරඹන්න 🚀</button>
+        <div style="margin-top: 20px; font-size: 12px; color: #555;">Presented by Vector Labs & E9 Shop</div>
+    </div>
 
-    <div id="game-area">
+    <div class="instruction">දබර ඇඟිල්ල අලියාගේ ඇස මත තබාගෙන සිටින්න!</div>
+
+    <div id="game-container">
         <div id="target"></div>
         <div id="eye-cursor"></div>
         <video id="webcam" playsinline></video>
     </div>
 
-    <div class="status" id="msg">කැමරාව සහ AI පද්ධතිය සූදානම් වෙමින්...</div>
+    <div class="status" id="msg">කැමරාව සූදානම් වෙමින්...</div>
+
+    <div class="bottom-branding">
+        <div class="main-topic">කිමේ බක්මහ උළෙල - 2026</div>
+        <div class="presented-by">PRESENTED BY <span>VECTOR LABS & E9 SHOP</span></div>
+    </div>
+
     <button id="res" onclick="location.reload()">නැවත උත්සාහ කරන්න 🔄</button>
 
     <script type="module">
         const eye = document.getElementById('eye-cursor');
         const target = document.getElementById('target');
         const msg = document.getElementById('msg');
-        const area = document.getElementById('game-area');
+        const area = document.getElementById('game-container');
         const resBtn = document.getElementById('res');
-        const videoElement = document.getElementById('webcam');
 
         let hitCount = 0;
         let isDone = false;
 
+        window.startApp = function() {
+            document.getElementById('splash-screen').style.opacity = '0';
+            setTimeout(() => document.getElementById('splash-screen').style.display = 'none', 500);
+            initCamera();
+        }
+
         function onResults(results) {
             if (isDone) return;
-            
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
                 eye.style.display = 'block';
-                msg.innerText = "නියමයි! දැන් ඇස නිවැරදි තැනට ගෙන යන්න...";
+                msg.innerText = "දැන් ඇඟිල්ල ඇස මත තබාගෙන සිටින්න...";
                 
                 const tip = results.multiHandLandmarks[0][8];
                 const x = (1 - tip.x) * area.offsetWidth;
@@ -102,9 +131,9 @@
                 if (d < 25) {
                     hitCount++;
                     target.style.background = "rgba(57, 255, 20, 0.6)";
-                    if (hitCount > 30) {
+                    if (hitCount > 40) { // තත්පර 1.5ක් පමණ තබාගෙන සිටිය යුතුයි
                         isDone = true;
-                        msg.innerText = "🎉 සුපිරි! ඔබ ජයග්‍රහණය කළා! 🏆";
+                        msg.innerText = "🎉 සුපිරි! ඔබ නිවැරදිව ඇස තැබුවා! 🏆";
                         msg.style.color = "#39ff14";
                         resBtn.style.display = "block";
                         eye.style.display = "none";
@@ -116,31 +145,17 @@
             }
         }
 
-        async function init() {
-            try {
-                const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-                hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
-                hands.onResults(onResults);
+        async function initCamera() {
+            const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+            hands.setOptions({ maxNumHands: 1, minDetectionConfidence: 0.6 });
+            hands.onResults(onResults);
 
-                const camera = new Camera(videoElement, {
-                    onFrame: async () => {
-                        try {
-                            await hands.send({image: videoElement});
-                        } catch (err) {
-                            console.error("Frame processing error:", err);
-                        }
-                    },
-                    width: 480, height: 640
-                });
-                await camera.start();
-                msg.innerText = "කැමරාව ඉදිරියට අත පෙන්වන්න...";
-            } catch (error) {
-                msg.innerText = "දෝෂයක් ඇතිවිය. කරුණාකර පිටුව Reload කරන්න.";
-                console.error(error);
-            }
+            const camera = new Camera(document.getElementById('webcam'), {
+                onFrame: async () => { await hands.send({image: document.getElementById('webcam')}); },
+                width: 480, height: 640
+            });
+            camera.start();
         }
-
-        init();
     </script>
 </body>
 </html>
