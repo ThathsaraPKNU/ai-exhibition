@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Smile Meter | 2026</title>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.js" crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --neon-pink: #ff007f;
+            --neon-blue: #00f2ff;
+            --dark-bg: #0a0a0a;
+        }
+
+        body {
+            margin: 0;
+            background: var(--dark-bg);
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .header {
+            background: #ffdd57;
+            color: #000;
+            width: 100%;
+            text-align: center;
+            padding: 10px 0;
+            font-weight: 900;
+            font-size: 18px;
+            box-shadow: 0 4px 15px rgba(255, 221, 87, 0.4);
+        }
+
+        h2 { color: var(--neon-blue); margin: 15px 0 5px 0; text-transform: uppercase; font-size: 18px; }
+
+        /* Camera Viewport */
+        #viewport {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%; /* රවුම් හැඩය ලස්සනයි */
+            border: 5px solid var(--neon-blue);
+            overflow: hidden;
+            background: #000;
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
+        }
+
+        video {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        /* Smile Progress Bar */
+        .meter-container {
+            width: 85%;
+            max-width: 400px;
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        .progress-bg {
+            background: #222;
+            height: 35px;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 2px solid #444;
+            position: relative;
+        }
+
+        #smile-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00f2ff, #ff007f);
+            transition: width 0.1s ease-out;
+            box-shadow: 0 0 15px var(--neon-pink);
+        }
+
+        #smile-percent {
+            font-size: 45px;
+            font-weight: 900;
+            margin-top: 10px;
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        #message {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #ffdd57;
+            font-weight: bold;
+            min-height: 25px;
+        }
+
+        footer { position: absolute; bottom: 10px; font-size: 10px; color: #444; }
+    </style>
+</head>
+<body>
+
+    <div class="header">🌸 කීමේ අවුරුදු උත්සවය - 2026 🌸</div>
+    <h2>AI සිනහව මනින යන්ත්‍රය</h2>
+
+    <div id="viewport">
+        <video id="webcam" autoplay playsinline></video>
+    </div>
+
+    <div class="meter-container">
+        <div class="progress-bg">
+            <div id="smile-bar"></div>
+        </div>
+        <div id="smile-percent">0%</div>
+        <div id="message">මුහුණ පෙන්වන්න...</div>
+    </div>
+
+    <footer>POWERED BY GOOGLE MEDIAPIPE | VECTOR LAB</footer>
+
+    <script type="module">
+        import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3";
+
+        const video = document.getElementById("webcam");
+        const smileBar = document.getElementById("smile-bar");
+        const smilePercent = document.getElementById("smile-percent");
+        const message = document.getElementById("message");
+
+        let faceLandmarker;
+        let lastVideoTime = -1;
+
+        async function setupAI() {
+            const filesetResolver = await FilesetResolver.forVisionTasks(
+                "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
+            );
+            faceLandmarker = await FaceLandmarker.createFromOptions(filesetResolver, {
+                baseOptions: {
+                    modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
+                    delegate: "GPU"
+                },
+                outputFaceBlendshapes: true,
+                runningMode: "VIDEO",
+                numFaces: 1
+            });
+            startCamera();
+        }
+
+        async function startCamera() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+            video.srcObject = stream;
+            video.addEventListener("loadeddata", predictWebcam);
+        }
+
+        async function predictWebcam() {
+            let startTimeMs = performance.now();
+            if (lastVideoTime !== video.currentTime) {
+                lastVideoTime = video.currentTime;
+                const results = faceLandmarker.detectForVideo(video, startTimeMs);
+
+                if (results.faceBlendshapes && results.faceBlendshapes.length > 0) {
+                    // "mouthSmileLeft" සහ "mouthSmileRight" යන අගයන් දෙකේ සාමාන්‍යය ගනී
+                    const shapes = results.faceBlendshapes[0].categories;
+                    const smileLeft = shapes.find(s => s.categoryName === "mouthSmileLeft").score;
+                    const smileRight = shapes.find(s => s.categoryName === "mouthSmileRight").score;
+                    
+                    let smileScore = ((smileLeft + smileRight) / 2) * 100;
+                    smileScore = Math.min(100, Math.max(0, smileScore * 1.5)); // සිනහව හොඳින් පෙන්වීමට මඳක් වැඩි කරයි
+
+                    updateUI(Math.round(smileScore));
+                }
+            }
+            requestAnimationFrame(predictWebcam);
+        }
+
+        function updateUI(score) {
+            smileBar.style.width = score + "%";
+            smilePercent.innerText = score + "%";
+
+            if (score < 20) {
+                message.innerText = "කෝ බලන්න හිනාවක්... 😊";
+                message.style.color = "#888";
+            } else if (score < 60) {
+                message.innerText = "තව ටිකක් හිනාවෙන්න! 😍";
+                message.style.color = "#00f2ff";
+            } else if (score < 90) {
+                message.innerText = "නියම හිනාව! 🌟";
+                message.style.color = "#ffdd57";
+            } else {
+                message.innerText = "සුපිරිම සිනහවක්! 🏆";
+                message.style.color = "#ff007f";
+            }
+        }
+
+        setupAI();
+    </script>
+</body>
+</html>
