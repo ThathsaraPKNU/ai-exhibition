@@ -15,7 +15,7 @@
             align-items: center; min-height: 100vh; overflow-x: hidden;
         }
 
-        /* ආරම්භක තිරය (Splash Screen) */
+        /* 1. ආරම්භක තිරය (Splash Screen) */
         #splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--dark); z-index: 1000; display: flex;
@@ -24,65 +24,63 @@
         }
         .splash-title { font-size: 2.2rem; color: var(--gold); font-weight: 900; margin-bottom: 5px; }
         .splash-sub { font-size: 1.4rem; color: var(--neon); font-weight: bold; margin-bottom: 25px; }
-        .start-btn { padding: 18px 45px; background: var(--neon); color: #000; border: none; border-radius: 40px; font-weight: bold; font-size: 1.2rem; cursor: pointer; }
+        .start-btn { padding: 18px 45px; background: var(--neon); color: #000; border: none; border-radius: 40px; font-weight: bold; font-size: 1.2rem; cursor: pointer; box-shadow: 0 0 15px var(--neon); }
 
-        /* Game UI */
+        /* Game Area */
         .instruction { color: var(--neon); font-size: 1rem; margin: 15px 10px; font-weight: bold; text-align: center; min-height: 1.2em; }
 
         #game-container {
             position: relative;
             width: 90vw;
-            aspect-ratio: 1 / 1; /* සමචතුරස්‍ර හැඩයට සකසා ඇත */
-            background: #fff url('image_2.png') no-repeat center;
+            aspect-ratio: 1 / 1;
+            background: #fff url('image_56b09e.jpg') no-repeat center;
             background-size: contain;
             border: 4px solid #333; border-radius: 20px;
             box-shadow: 0 0 30px rgba(0,0,0,0.6);
         }
 
-        /* 🎯 ඇස තිබිය යුතු නිවැරදි ස්ථානය (Target Fixed) */
+        /* ඇස තිබිය යුතු නිවැරදි ස්ථානය (Target) */
         #target {
             position: absolute;
             width: 5%; height: 5%;
             background: rgba(255, 0, 0, 0.4);
             border-radius: 50%;
-            top: 32.5%; left: 71.3%; /* අලියාගේ ඇස මතට නිවැරදි කරන ලදී */
+            top: 32.5%; left: 71.3%; 
             border: 2px dashed red;
             transform: translate(-50%, -50%);
         }
 
         #eye-cursor {
             position: absolute;
-            width: 40px; height: 40px;
+            width: 45px; height: 45px;
             background: url('https://cdn-icons-png.flaticon.com/512/595/595053.png') no-repeat center;
             background-size: contain;
             pointer-events: none; z-index: 100; display: none;
         }
 
-        /* 🏢 පල්ලෙහා Branding කොටස */
+        /* 2. Branding Section - Highlighted Below Image */
         .branding-section {
             width: 100%;
             text-align: center;
             padding: 20px 10px;
-            background: linear-gradient(to bottom, transparent, rgba(255, 204, 0, 0.05));
         }
         .main-topic-highlight {
             font-size: 2.4rem; 
             color: var(--gold); 
             font-weight: 900; 
-            margin: 10px 0;
-            text-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
-            letter-spacing: 1px;
+            margin: 5px 0;
+            text-shadow: 0 0 15px rgba(255, 204, 0, 0.6);
         }
         .sponsored-text {
-            font-size: 0.9rem;
+            font-size: 1rem;
             color: #ccc;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             margin-top: 5px;
         }
-        .sponsored-text b { color: #fff; font-size: 1rem; }
+        .sponsored-text b { color: #fff; font-weight: 900; }
 
         #webcam { display: none; }
-        #res-btn { margin-top: 20px; padding: 12px 30px; background: var(--neon); color: #000; border: none; border-radius: 25px; font-weight: bold; display: none; }
+        #res-btn { margin-top: 15px; padding: 12px 30px; background: var(--neon); color: #000; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; display: none; }
     </style>
 </head>
 <body>
@@ -91,6 +89,7 @@
         <div class="splash-title">කිමේ බක්මහ උළෙල - 2026</div>
         <div class="splash-sub">AI අවුරුදු ක්‍රීඩා</div>
         <button class="start-btn" onclick="startApp()">ක්‍රීඩාව අරඹන්න 🚀</button>
+        <div style="margin-top: 20px; font-size: 0.8rem; color: #555;">Presented by Vector Labs & E9 Shop</div>
     </div>
 
     <div class="instruction" id="top-msg">දබර ඇඟිල්ල ඔසවා ඇස අලියා වෙත ගෙන යන්න</div>
@@ -113,6 +112,7 @@
         const topMsg = document.getElementById('top-msg');
         const area = document.getElementById('game-container');
         const resBtn = document.getElementById('res-btn');
+        const videoElement = document.getElementById('webcam');
 
         let hitTime = 0;
         let isDone = false;
@@ -124,6 +124,7 @@
 
         function onResults(results) {
             if (isDone) return;
+            
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
                 eye.style.display = 'block';
                 
@@ -131,18 +132,18 @@
                 const x = (1 - tip.x) * area.offsetWidth;
                 const y = tip.y * area.offsetHeight;
 
-                eye.style.left = `${x - 20}px`;
-                eye.style.top = `${y - 20}px`;
+                eye.style.left = `${x - 22}px`;
+                eye.style.top = `${y - 22}px`;
 
                 const tx = target.offsetLeft;
                 const ty = target.offsetTop;
                 const d = Math.sqrt(Math.pow(x - tx, 2) + Math.pow(y - ty, 2));
 
-                if (d < 25) {
+                if (d < 30) {
                     hitTime++;
-                    target.style.background = "rgba(57, 255, 20, 0.6)";
+                    target.style.background = "rgba(57, 255, 20, 0.7)";
                     topMsg.innerText = "නියමයි! ඇඟිල්ල එතැනම තබාගෙන සිටින්න...";
-                    if (hitTime > 40) {
+                    if (hitTime > 35) {
                         isDone = true;
                         topMsg.innerText = "🎉 සුපිරි! ඔබ නිවැරදිව ඇස තැබුවා! 🏆";
                         topMsg.style.color = "#39ff14";
@@ -154,19 +155,38 @@
                     target.style.background = "rgba(255, 0, 0, 0.4)";
                     topMsg.innerText = "දබර ඇඟිල්ල අලියාගේ ඇස මත තබන්න";
                 }
+            } else {
+                eye.style.display = 'none';
+                topMsg.innerText = "කැමරාවට අත පෙන්වන්න...";
             }
         }
 
         async function initAI() {
-            const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-            hands.setOptions({ maxNumHands: 1, minDetectionConfidence: 0.6 });
-            hands.onResults(onResults);
+            try {
+                const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+                hands.setOptions({ 
+                    maxNumHands: 1, 
+                    modelComplexity: 1, // හඳුනාගැනීමේ නිරවද්‍යතාව වැඩි කරන ලදී
+                    minDetectionConfidence: 0.5, 
+                    minTrackingConfidence: 0.5 
+                });
+                hands.onResults(onResults);
 
-            const camera = new Camera(document.getElementById('webcam'), {
-                onFrame: async () => { await hands.send({image: document.getElementById('webcam')}); },
-                width: 480, height: 480
-            });
-            camera.start();
+                const camera = new Camera(videoElement, {
+                    onFrame: async () => {
+                        try {
+                            await hands.send({image: videoElement});
+                        } catch (e) {
+                            console.log("Hand detection skipped for a frame.");
+                        }
+                    },
+                    width: 480, height: 480
+                });
+                await camera.start();
+                topMsg.innerText = "දබර ඇඟිල්ල ඔසවන්න...";
+            } catch (err) {
+                topMsg.innerText = "පද්ධතිය ආරම්භ කිරීමට නොහැකි විය. කරුණාකර Reload කරන්න.";
+            }
         }
     </script>
 </body>
