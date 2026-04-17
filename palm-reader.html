@@ -38,7 +38,7 @@
         /* Layout Container */
         .display-wrapper {
             display: flex;
-            flex-direction: row; /* දකුණු පසට පෙළගැස්වීම */
+            flex-direction: row;
             justify-content: center;
             align-items: stretch;
             gap: 30px;
@@ -106,7 +106,7 @@
         .scientific-fact-box {
             background: rgba(0, 242, 255, 0.03);
             border: 1px solid rgba(0, 242, 255, 0.2);
-            border-right: 6px solid var(--neon-cyan); /* දකුණු පසින් කැපී පෙනෙන ඉරක් */
+            border-right: 6px solid var(--neon-cyan);
             padding: 25px;
             border-radius: 15px 0 0 15px;
             flex-grow: 1;
@@ -141,11 +141,6 @@
             font-size: 11px;
             color: #444;
             text-align: center;
-        }
-
-        @media (max-width: 1000px) {
-            .display-wrapper { flex-direction: column; align-items: center; }
-            .right-info-panel { width: 640px; }
         }
     </style>
 </head>
@@ -216,13 +211,14 @@
                     setInterval(() => {
                         if (isAnalyzing) return;
                         
+                        // model.execute වෙනුවට model.detect භාවිතා කර ඇත
                         model.detect(video).then(predictions => {
                             ctx.clearRect(0, 0, canvas.width, canvas.height);
                             
                             if (predictions.length > 0) {
                                 const palm = predictions[0];
                                 
-                                // Boundary Box
+                                // Boundary Box ඇඳීම
                                 ctx.strokeStyle = "#00f2ff";
                                 ctx.lineWidth = 4;
                                 ctx.strokeRect(palm.bbox.x, palm.bbox.y, palm.bbox.width, palm.bbox.height);
@@ -242,7 +238,7 @@
             statusText.innerHTML = "● ANALYZING DERMAL PATTERNS...";
             predictionBox.innerHTML = "අල්ල නිසලව තබා ගන්න...";
 
-            // Consistency Hashing (එකම අතට එකම ප්‍රතිඵලය)
+            // එකම අතට එකම ප්‍රතිඵලය ලැබීමට Hashing භාවිතා කරයි
             const hashIndex = Math.floor((bbox.x + bbox.y + bbox.width) % fortunes.length);
 
             setTimeout(() => {
