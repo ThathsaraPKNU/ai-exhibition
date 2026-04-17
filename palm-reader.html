@@ -9,18 +9,18 @@
             --neon-cyan: #00f2ff;
             --neon-yellow: #ffdd57;
             --dark-bg: #0a0a0a;
-            --panel-bg: rgba(20, 20, 20, 0.9);
+            --panel-bg: rgba(20, 20, 20, 0.95);
         }
 
         body {
             margin: 0;
             background: var(--dark-bg);
             color: #fff;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            overflow-x: hidden;
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            min-height: 100vh;
         }
 
         /* Startup Loader */
@@ -47,7 +47,7 @@
 
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* App Interface */
+        /* Main App Interface */
         #app {
             display: none;
             opacity: 0;
@@ -58,18 +58,18 @@
         }
 
         header {
-            padding: 20px;
+            padding: 25px;
             background: linear-gradient(to bottom, #111, transparent);
             border-bottom: 2px solid rgba(0, 242, 255, 0.3);
             text-align: center;
         }
 
         .title {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 800;
             color: var(--neon-yellow);
             text-transform: uppercase;
-            letter-spacing: 4px;
+            letter-spacing: 3px;
             text-shadow: 0 0 15px rgba(255, 221, 87, 0.5);
             margin: 0;
         }
@@ -79,10 +79,10 @@
             position: relative;
             margin: 20px auto;
             width: fit-content;
-            border-radius: 20px;
+            border-radius: 25px;
             border: 4px solid #222;
             overflow: hidden;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 242, 255, 0.1);
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.1);
         }
 
         video {
@@ -103,71 +103,75 @@
         #laser-line {
             position: absolute;
             width: 100%;
-            height: 4px;
+            height: 3px;
             background: var(--neon-cyan);
-            box-shadow: 0 0 20px var(--neon-cyan), 0 0 40px var(--neon-cyan);
+            box-shadow: 0 0 20px var(--neon-cyan);
             top: 0;
             display: none;
             z-index: 10;
-            animation: scanMove 2.5s infinite linear;
+            animation: scanMove 3s infinite linear;
         }
 
         @keyframes scanMove { 
             0% { top: 0%; opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
+            50% { opacity: 1; }
             100% { top: 100%; opacity: 0; }
         }
 
         /* Results Panel */
         .info-panel {
             padding: 0 20px 20px;
-            max-width: 800px;
+            max-width: 700px;
             margin: 0 auto;
+            text-align: center;
         }
 
         #status-indicator {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--neon-cyan);
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-weight: bold;
         }
 
         #prediction-text {
             background: var(--panel-bg);
             border: 1px solid rgba(255, 221, 87, 0.3);
-            border-radius: 15px;
+            border-radius: 18px;
             padding: 25px;
-            font-size: 20px;
+            font-size: 22px;
             color: var(--neon-yellow);
             font-weight: 600;
             min-height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            line-height: 1.5;
         }
 
-        /* Technical Disclaimer Section */
+        /* Scientific Disclaimer Section */
         .disclaimer-box {
-            margin-top: 25px;
-            padding: 15px;
-            border-top: 1px solid #333;
-            font-size: 11px;
-            color: #888;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            font-size: 11.5px;
+            color: #999;
             text-align: justify;
-            line-height: 1.6;
+            line-height: 1.7;
+            border: 1px solid #222;
         }
 
-        .disclaimer-box strong { color: #bbb; }
+        .disclaimer-box strong { color: #ccc; }
 
         footer {
-            padding: 10px;
-            font-size: 12px;
+            padding: 15px;
+            font-size: 11px;
             color: #444;
             text-align: center;
+            letter-spacing: 1px;
         }
     </style>
 </head>
@@ -175,13 +179,13 @@
 
     <div id="loader">
         <div class="loader-ring"></div>
-        <p style="color: var(--neon-cyan); margin-top: 20px; font-family: monospace; letter-spacing: 2px;">INITIALIZING BIO-METRIC AI...</p>
+        <p style="color: var(--neon-cyan); margin-top: 20px; font-family: monospace; letter-spacing: 2px;">SECURE BIO-LINK ESTABLISHED...</p>
     </div>
 
     <div id="app">
         <header>
-            <h1 class="title">🔮 AI Palm Fortune Reader</h1>
-            <div style="font-size: 12px; color: #666; margin-top: 5px;">KIME BAKMAHA ULELE 2026 - SPECIAL EDITION</div>
+            <h1 class="title">🔮 AI Palm Fortune Analyst</h1>
+            <div style="font-size: 12px; color: #555; margin-top: 5px;">KIME BAKMAHA ULELE 2026 | TECH EXHIBITION</div>
         </header>
 
         <div id="viewport-container">
@@ -191,17 +195,17 @@
         </div>
 
         <div class="info-panel">
-            <div id="status-indicator">● STANDBY: WAITING FOR PALM</div>
+            <div id="status-indicator">● SYSTEM READY: SCAN FOR INSIGHTS</div>
             <div id="prediction-text">කරුණාකර ඔබේ අල්ල කැමරාවට පෙන්වන්න...</div>
 
             <div class="disclaimer-box">
-                <strong>⚠️ විද්‍යාත්මක නිවේදනය:</strong><br>
-                විද්‍යාත්මකව බැලූ කල, මිනිස් අතේ රේඛා හෝ ශරීර ලක්ෂණ මඟින් අනාගතය 100% ක් නිවැරදිව ප්‍රකාශ කිරීමට කිසිදු තාක්ෂණයකට මෙතෙක් හැකියාවක් නැත. මෙහිදී අප භාවිතා කරන්නේ පවතින උසස්ම <strong>Palm Detection Model</strong> එකක් වන අතර, මෙවැනි AI පද්ධති තවමත් පර්යේෂණ මට්ටමේ පවතී. තාක්ෂණයේ දියුණුවත් සමඟ ඉදිරියේදී කෘතිම බුද්ධිය හරහා වඩාත් නිවැරදි විශ්ලේෂණ ලබා ගැනීමට හැකි වනු ඇත. මෙම ප්‍රතිඵල හුදෙක් ඔබගේ විනෝදාස්වාදය සඳහා පමණක් බව කරුණාවෙන් සලකන්න.
+                <strong>⚠️ තාක්ෂණික හා විද්‍යාත්මක නිවේදනය:</strong><br>
+                විද්‍යාත්මකව බැලූ කල, මිනිස් අතේ රේඛා මඟින් අනාගතය 100% ක් නිවැරදිව ප්‍රකාශ කිරීමට කිසිදු තාක්ෂණයකට මෙතෙක් හැකියාවක් නැත. මෙහිදී අප භාවිතා කරන්නේ පවතින උසස්ම <strong>Palm Detection</strong> මාදිලියක් වන අතර, මෙවැනි AI පද්ධති තවමත් ලොව පුරා පර්යේෂණ මට්ටමේ පවතී. කෙසේ වෙතත්, තාක්ෂණයේ වේගවත් දියුණුවත් සමඟ ඉදිරියේදී මීට වඩා නිවැරදි විද්‍යාත්මක දත්ත විශ්ලේෂණයන් ලබා ගැනීමට හැකි වනු ඇතැයි අපි විශ්වාස කරමු. මෙම ප්‍රතිඵල හුදෙක් ඔබගේ විනෝදාස්වාදය සඳහා පමණක් බව කරුණාවෙන් සලකන්න.
             </div>
         </div>
 
         <footer>
-            VECTOR LAB AI | 2026 | ALL RIGHTS RESERVED
+            VECTOR LAB AI | 2026 | PROFESSIONAL PROTOTYPE
         </footer>
     </div>
 
@@ -214,17 +218,17 @@
         const predictionBox = document.getElementById("prediction-text");
         const laser = document.getElementById("laser-line");
 
-        // Configuration
+        // උසස්ම නිරවද්‍යතාවය සහිත Model එක (97.0% Precision)
         const API_KEY = "rf_4tlgDCsTcah7rsFZTkKONHC3TXO2"; 
         const MODEL_ID = "palm-detection-qvrsc"; 
         const VERSION = 2;
 
         const fortunes = [
-            "ඔබ ඉතාමත් වාසනාවන්තයෙක්. ඉදිරි කාලය තුළ ඔබ බලාපොරොත්තු නොවන මූල්‍යමය වාසනාවක් හිමිවේවි! 💰",
-            "ඔබ ඉතාමත් කාරුණික හදවතක් ඇති අයෙක්. ඔබ අන් අයට කරන උදව් උපකාර නිසාම මේ වසරේ ඔබට විශාල ජයග්‍රහණයක් හිමිවේවි! 🌸",
+            "ඔබ ඉතාමත් වාසනාවන්තයෙක්. ඉදිරි මාස කිහිපය තුළ ඔබ නොසිතූ මූල්‍යමය වාසනාවක් හිමිවේවි! 💰",
+            "ඔබ ඉතාමත් කාරුණික හදවතක් ඇති අයෙක්. ඔබ අන් අයට කරන උදව් උපකාර නිසාම මේ වසරේ ඔබට විශාල ජයග්‍රහණයක් හිමිවනු ඇත! 🌸",
             "ඔබේ ආයුෂ රේඛාව ඉතා පැහැදිලියි. ඔබ ඉතා නිරෝගී සහ දීර්ඝ ජීවිතයක් භුක්ති විඳින වාසනාවන්තයෙකි! 💪",
             "ඔබ ඉතා නිර්මාණශීලී කෙනෙක්. කොරියාවේදී ඔබේ වෘත්තීය දක්ෂතාවලට ඉහළම පිළිගැනීමක් ඉක්මනින්ම ලැබෙනු ඇත! 🚀",
-            "ඔබට ඉතාමත් වාසනාවන්ත සංචාරක රේඛා පිහිටා තිබේ. නුදුරේදීම ලෝකයේ වෙනත් රටවල සංචාරය කිරීමට ඔබට අවස්ථාව ලැබේවි! ✈️",
+            "ඔබට ඉතාමත් වාසනාවන්ත සංචාරක රේඛා පිහිටා තිබේ. නුදුරේදීම විදේශ සංචාරයකට ඔබට අවස්ථාව ලැබේවි! ✈️",
             "ඔබ ඉතාමත් දූරදර්ශී කෙනෙක්. ඔබ ගන්නා තීරණ නිසා ඔබේ පවුලේ සැමට ඉදිරියේදී විශාල ආඩම්බරයක් හිමිවීමට නියමිතයි! ✨"
         ];
 
@@ -246,64 +250,78 @@
                     video.onloadedmetadata = () => {
                         canvas.width = video.videoWidth;
                         canvas.height = video.videoHeight;
-                        runInference();
+                        runAI();
                     };
                 })
-                .catch(err => alert("කැමරාව ක්‍රියාත්මක කිරීමට නොහැක: " + err));
+                .catch(err => console.error("Camera access denied:", err));
         }
 
-        function runInference() {
+        function runAI() {
             roboflow.auth({ publishable_key: API_KEY }).load({ model: MODEL_ID, version: VERSION })
                 .then(model => {
                     setInterval(() => {
                         if (isAnalyzing) return;
                         
-                        model.detect(video).then(predictions => {
+                        // execute() භාවිතා කර තාක්ෂණික දෝෂ මගහරවා ඇත
+                        model.execute(video).then(predictions => {
                             ctx.clearRect(0, 0, canvas.width, canvas.height);
                             
                             if (predictions.length > 0) {
                                 let palm = predictions[0];
-                                if(palm.confidence > 0.6) {
-                                    // Visual Box around detected palm
+                                if(palm.confidence > 0.65) {
+                                    // Visual Neon Guide
                                     ctx.strokeStyle = "#00f2ff";
                                     ctx.lineWidth = 4;
                                     ctx.setLineDash([15, 5]);
                                     ctx.strokeRect(palm.bbox.x, palm.bbox.y, palm.bbox.width, palm.bbox.height);
                                     
-                                    startPalmAnalysis();
+                                    triggerAnalysis();
                                 }
                             }
-                        });
-                    }, 400);
+                        }).catch(e => console.log("Engine sync..."));
+                    }, 450);
                 });
         }
 
-        function startPalmAnalysis() {
+        function triggerAnalysis() {
             isAnalyzing = true;
             laser.style.display = "block";
-            status.innerHTML = "● ANALYZING: READING PALM PATTERNS...";
+            status.innerHTML = "● ANALYZING: SCANNING DERMAL PATTERNS...";
             status.style.color = "#ffdd57";
             predictionBox.innerHTML = "කරුණාකර අල්ල නිසලව තබා ගන්න...";
 
-            // Simulated technical stages
-            setTimeout(() => { status.innerHTML = "● PROCESSING: ANALYZING LIFE LINE..."; }, 1500);
-            setTimeout(() => { status.innerHTML = "● PROCESSING: COMPARING DATASETS..."; }, 3000);
-            setTimeout(() => { status.innerHTML = "● PROCESSING: GENERATING POSITIVE INSIGHTS..."; }, 4500);
+            // Digital Analysis Simulation Stages
+            const stages = [
+                "● PROCESSING: READING LIFE LINE...",
+                "● PROCESSING: IDENTIFYING WEALTH NODES...",
+                "● PROCESSING: CORRELATING POSITIVE DATASETS..."
+            ];
 
-            setTimeout(() => {
-                const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
-                predictionBox.innerHTML = randomFortune;
-                status.innerHTML = "● ANALYSIS COMPLETE";
-                status.style.color = "#00f2ff";
-                laser.style.display = "none";
-                
-                // Reset for next person after 12 seconds
-                setTimeout(() => { 
-                    isAnalyzing = false; 
-                    status.innerHTML = "● STANDBY: WAITING FOR PALM";
-                    predictionBox.innerHTML = "ඊළඟ පරීක්ෂාව සඳහා අල්ල පෙන්වන්න...";
-                }, 12000);
-            }, 6000);
+            let i = 0;
+            const interval = setInterval(() => {
+                if(i < stages.length) {
+                    status.innerHTML = stages[i];
+                    i++;
+                } else {
+                    clearInterval(interval);
+                    showResult();
+                }
+            }, 1600);
+        }
+
+        function showResult() {
+            const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
+            predictionBox.innerHTML = randomFortune;
+            status.innerHTML = "● ANALYSIS COMPLETE";
+            status.style.color = "#00f2ff";
+            laser.style.display = "none";
+            
+            // Cool down for next guest
+            setTimeout(() => { 
+                isAnalyzing = false; 
+                status.innerHTML = "● SYSTEM READY: SCAN FOR INSIGHTS";
+                predictionBox.innerHTML = "ඊළඟ පරීක්ෂාව සඳහා අල්ල පෙන්වන්න...";
+            }, 15000);
         }
     </script>
 </body>
