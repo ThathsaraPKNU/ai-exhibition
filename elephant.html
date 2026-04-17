@@ -3,80 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Elephant Game | Mobile</title>
+    <title>AI Elephant Game | 2026</title>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
     
     <style>
-        :root { --gold: #ffcc00; --neon: #39ff14; --dark: #0a0a0a; }
+        :root { --gold: #ffcc00; --neon: #39ff14; --dark: #050505; }
         
         body { 
             margin: 0; background: var(--dark); color: #fff; 
-            font-family: 'Segoe UI', sans-serif; 
-            display: flex; flex-direction: column; align-items: center;
-            height: 100vh; overflow: hidden;
+            font-family: sans-serif; display: flex; flex-direction: column; 
+            align-items: center; height: 100vh; overflow: hidden;
         }
 
-        /* 1. Mobile Optimized Header */
         .main-header {
             background: var(--gold); color: #000; width: 100%;
-            text-align: center; padding: 15px 0; font-weight: 900;
-            font-size: 1.2rem; box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
+            text-align: center; padding: 12px 0; font-weight: 900; font-size: 1.1rem;
         }
 
-        .instruction {
-            color: var(--neon); font-size: 0.9rem; margin: 15px 10px;
-            font-weight: bold; text-align: center; line-height: 1.4;
+        .instruction-box {
+            background: rgba(57, 255, 20, 0.1); border: 1px solid var(--neon);
+            padding: 10px; margin: 10px; border-radius: 10px; color: var(--neon);
+            font-weight: bold; text-align: center; font-size: 0.85rem;
         }
 
-        /* 2. Game Area - Phone Size (Responsive) */
         #game-area {
             position: relative;
-            width: 92vw; height: 55vh; /* ෆෝන් එකේ උසට ගැළපෙන සේ */
-            background: #fff url('image_56b09e.jpg') no-repeat center;
+            width: 90vw; height: 50vh; 
+            background: #fff url('image_56b09e.jpg') no-repeat center; /* මෙහි නම වෙනස් කළේ නැත */
             background-size: contain;
-            border: 3px solid #333; border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            border: 3px solid #444; border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        /* 3. Correct Eye Position (අලියාගේ ඇස උඩටම) */
+        /* ඇස තැබිය යුතු නිවැරදි ස්ථානය */
         #target {
             position: absolute;
-            width: 12px; height: 12px;
+            width: 15px; height: 15px;
             background: rgba(255, 0, 0, 0.4);
             border-radius: 50%;
-            /* පින්තූරයේ ඇස ඇති තැන (මේ අගයන් image_56b09e.jpg ට ගැළපේ) */
-            top: 31%; left: 71%; 
+            top: 30.5%; left: 71.5%; /* අලියාගේ ඇස ඇති තැන */
             border: 2px dashed red;
             transform: translate(-50%, -50%);
         }
 
         #eye-cursor {
             position: absolute;
-            width: 30px; height: 30px;
+            width: 35px; height: 35px;
             background: url('https://cdn-icons-png.flaticon.com/512/595/595053.png') no-repeat center;
             background-size: contain;
-            pointer-events: none; z-index: 100;
-            display: none;
+            pointer-events: none; z-index: 100; display: none;
         }
 
-        .status-box { margin-top: 15px; font-size: 1.1rem; font-weight: bold; color: var(--gold); }
-        
-        #restart-btn {
-            margin-top: 10px; padding: 12px 25px; 
-            background: var(--neon); border: none; border-radius: 30px;
-            font-weight: bold; display: none;
-        }
-
+        .status { margin-top: 15px; font-weight: bold; color: var(--gold); font-size: 1rem; }
         #webcam { display: none; }
-        .footer { position: absolute; bottom: 10px; font-size: 10px; color: #444; }
+        
+        button {
+            margin-top: 15px; padding: 12px 30px; background: var(--neon);
+            border: none; border-radius: 25px; font-weight: bold; cursor: pointer; display: none;
+        }
     </style>
 </head>
 <body>
 
     <div class="main-header">🌸 කීමේ බක්මහ උළෙල - 2026 🌸</div>
     
-    <div class="instruction">
+    <div class="instruction-box">
         ඔබේ සිනහව වගේම ඇස් පෙනීමත් හොඳද? <br>
         දබර ඇඟිල්ලෙන් ඇස ගෙන ගොස් අලියාට තබන්න!
     </div>
@@ -87,66 +79,63 @@
         <video id="webcam"></video>
     </div>
 
-    <div class="status-box" id="msg">පද්ධතිය සූදානම් වෙමින්...</div>
-    <button id="restart-btn" onclick="location.reload()">නැවත උත්සාහ කරන්න 🔄</button>
-
-    <div class="footer">PRESENTED BY VECTOR LABS AI × E9 SHOP</div>
+    <div class="status" id="msg">කැමරාව සූදානම් වෙමින්...</div>
+    <button id="res" onclick="location.reload()">නැවත උත්සාහ කරන්න 🔄</button>
 
     <script type="module">
         const eye = document.getElementById('eye-cursor');
         const target = document.getElementById('target');
         const msg = document.getElementById('msg');
         const area = document.getElementById('game-area');
-        const btn = document.getElementById('restart-btn');
+        const resBtn = document.getElementById('res');
 
-        let count = 0;
-        let won = false;
+        let hitCount = 0;
+        let isDone = false;
 
         function onResults(results) {
-            if (won) return;
+            if (isDone) return;
             
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
                 eye.style.display = 'block';
-                msg.innerText = "නියමයි! දැන් ඇස තැනට ගෙන යන්න...";
+                msg.innerText = "දැන් ඇස නිවැරදි තැනට ගෙන යන්න...";
                 
-                const tip = results.multiHandLandmarks[0][8];
+                const tip = results.multiHandLandmarks[0][8]; // Index finger
                 const x = (1 - tip.x) * area.offsetWidth;
                 const y = tip.y * area.offsetHeight;
 
-                eye.style.left = `${x - 15}px`;
-                eye.style.top = `${y - 15}px`;
+                eye.style.left = `${x - 17}px`;
+                eye.style.top = `${y - 17}px`;
 
-                // දුර මැනීම
                 const tx = target.offsetLeft;
                 const ty = target.offsetTop;
-                const dist = Math.sqrt(Math.pow(x - tx, 2) + Math.pow(y - ty, 2));
+                const d = Math.sqrt(Math.pow(x - tx, 2) + Math.pow(y - ty, 2));
 
-                if (dist < 20) {
-                    count++;
+                if (d < 25) {
+                    hitCount++;
                     target.style.background = "rgba(57, 255, 20, 0.6)";
-                    if (count > 30) {
-                        won = true;
+                    if (hitCount > 40) {
+                        isDone = true;
                         msg.innerText = "🎉 සුපිරි! ඔබ ජයග්‍රහණය කළා! 🏆";
                         msg.style.color = "#39ff14";
-                        btn.style.display = "block";
+                        resBtn.style.display = "block";
                         eye.style.display = "none";
                     }
                 } else {
-                    count = 0;
+                    hitCount = 0;
                     target.style.background = "rgba(255, 0, 0, 0.4)";
                 }
             }
         }
 
         const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6 });
+        hands.setOptions({ maxNumHands: 1, minDetectionConfidence: 0.6 });
         hands.onResults(onResults);
 
         const camera = new Camera(document.getElementById('webcam'), {
             onFrame: async () => { await hands.send({image: document.getElementById('webcam')}); },
             width: 480, height: 640
         });
-        camera.start().then(() => { msg.innerText = "කැමරාව ඉදිරියට අත පෙන්වන්න..."; });
+        camera.start();
     </script>
 </body>
 </html>
