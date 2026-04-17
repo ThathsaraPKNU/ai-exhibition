@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Palm Analyst | 2026</title>
+    <title>AI Palm Scanner | Vector Lab AI</title>
     <style>
         :root {
             --neon-cyan: #00f2ff;
             --neon-yellow: #ffdd57;
             --dark-bg: #0a0a0a;
+            --panel-bg: rgba(20, 20, 20, 0.95);
         }
 
         body {
@@ -16,128 +17,150 @@
             background: var(--dark-bg);
             color: #fff;
             font-family: 'Segoe UI', sans-serif;
+            overflow-x: hidden;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
 
+        /* Startup Loader */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loader-ring {
+            width: 80px;
+            height: 80px;
+            border: 3px solid rgba(0, 242, 255, 0.1);
+            border-top: 3px solid var(--neon-cyan);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Main App Interface */
+        #app {
+            display: none;
+            opacity: 0;
+            transition: opacity 1s ease-in;
+            flex: 1;
+            flex-direction: column;
+        }
+
         header {
-            width: 100%;
-            padding: 25px 0;
+            padding: 25px;
+            background: linear-gradient(to bottom, #111, transparent);
+            border-bottom: 2px solid rgba(0, 242, 255, 0.3);
             text-align: center;
         }
 
-        .main-topic {
-            font-size: 36px;
-            font-weight: 900;
+        .title {
+            font-size: 26px;
+            font-weight: 800;
             color: var(--neon-yellow);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 15px rgba(255, 221, 87, 0.5);
             margin: 0;
-            text-shadow: 0 0 15px rgba(255, 221, 87, 0.3);
         }
 
-        /* Layout Container */
-        .display-wrapper {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: stretch;
-            gap: 30px;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Camera Section */
-        #container {
+        #viewport-container {
             position: relative;
+            margin: 20px auto;
+            width: fit-content;
+            border-radius: 25px;
             border: 4px solid #222;
-            border-radius: 20px;
             overflow: hidden;
-            width: 640px;
-            height: 480px;
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.1);
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.1);
         }
 
-        video, canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
+        video {
+            display: block;
             width: 100%;
-            height: 100%;
+            max-width: 640px;
+            transform: scaleX(-1);
+            filter: brightness(1.1) contrast(1.1);
+        }
+
+        canvas {
+            position: absolute;
+            inset: 0;
             transform: scaleX(-1);
         }
 
         #laser-line {
             position: absolute;
             width: 100%;
-            height: 4px;
+            height: 3px;
             background: var(--neon-cyan);
-            box-shadow: 0 0 15px var(--neon-cyan);
-            z-index: 10;
+            box-shadow: 0 0 20px var(--neon-cyan);
+            top: 0;
             display: none;
-            animation: scan 3s infinite linear;
+            z-index: 10;
+            animation: scanMove 3s infinite linear;
         }
 
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        @keyframes scanMove { 
+            0% { top: 0%; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
 
-        /* Right Side Panel */
-        .right-info-panel {
-            width: 400px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        .info-panel {
+            padding: 0 20px 20px;
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        #status-indicator {
+            font-size: 13px;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            font-weight: bold;
         }
 
         #prediction-text {
-            background: rgba(255, 221, 87, 0.05);
-            border: 2px solid var(--neon-yellow);
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 221, 87, 0.3);
+            border-radius: 18px;
             padding: 25px;
-            border-radius: 15px;
             font-size: 22px;
-            font-weight: bold;
             color: var(--neon-yellow);
-            text-align: center;
-            min-height: 100px;
+            font-weight: 600;
+            min-height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            line-height: 1.5;
         }
 
-        .scientific-fact-box {
-            background: rgba(0, 242, 255, 0.03);
-            border: 1px solid rgba(0, 242, 255, 0.2);
-            border-right: 6px solid var(--neon-cyan);
-            padding: 25px;
-            border-radius: 15px 0 0 15px;
-            flex-grow: 1;
-        }
-
-        .scientific-fact-box h2 {
-            font-size: 24px;
-            color: var(--neon-cyan);
-            margin-top: 0;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-        }
-
-        .scientific-fact-box p {
-            font-size: 14.5px;
-            color: #ccc;
-            line-height: 1.8;
+        .disclaimer-box {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            font-size: 11.5px;
+            color: #999;
             text-align: justify;
-            margin: 0;
-        }
-
-        #status-bar {
-            font-size: 12px;
-            letter-spacing: 2px;
-            color: var(--neon-cyan);
-            margin-bottom: 8px;
-            font-weight: bold;
+            line-height: 1.7;
+            border: 1px solid #222;
         }
 
         footer {
-            padding: 20px;
+            padding: 15px;
             font-size: 11px;
             color: #444;
             text-align: center;
@@ -146,43 +169,43 @@
 </head>
 <body>
 
-    <header>
-        <h1 class="main-topic">2026 කිමේ බක්මහ උළෙල</h1>
-    </header>
+    <div id="loader">
+        <div class="loader-ring"></div>
+        <p style="color: var(--neon-cyan); margin-top: 20px; font-family: monospace; letter-spacing: 2px;">SECURE BIO-LINK ESTABLISHED...</p>
+    </div>
 
-    <div class="display-wrapper">
-        <div id="container">
+    <div id="app">
+        <header>
+            <h1 class="title">🔮 AI Palm Fortune Analyst</h1>
+            <div style="font-size: 12px; color: #555; margin-top: 5px;">KIME BAKMAHA ULELE 2026 | TECH EXHIBITION</div>
+        </header>
+
+        <div id="viewport-container">
             <div id="laser-line"></div>
             <video id="webcam" autoplay playsinline muted></video>
             <canvas id="overlay"></canvas>
         </div>
 
-        <div class="right-info-panel">
-            <div>
-                <span id="status-bar">● AI SYSTEM ACTIVE</span>
-                <div id="prediction-text">අනාගතය දැනගැනීමට අල්ල පෙන්වන්න...</div>
-            </div>
+        <div class="info-panel">
+            <div id="status-indicator">● SYSTEM READY: SCAN FOR INSIGHTS</div>
+            <div id="prediction-text">කරුණාකර ඔබේ අල්ල කැමරාවට පෙන්වන්න...</div>
 
-            <div class="scientific-fact-box">
-                <h2>විද්‍යාත්මක සත්‍යය:</h2>
-                <p>
-                    අතේ රේඛා මඟින් අනාගතය 100% ක් නිවැරදිව ප්‍රකාශ කිරීමට මෙතෙක් ලොව කිසිදු තාක්ෂණයකට හැකියාවක් නැත. මෙහිදී අප සිදු කරනු ලබන්නේ පවතින උසස්ම <strong>Palm Detection Model</strong> එකක් භාවිතයෙන් අල්ලේ රේඛා රටා (Patterns) හඳුනාගෙන ඒවා දත්ත පද්ධතියක් සමඟ සංසන්දනය කර ධනාත්මක මගපෙන්වීමක් ලබා දීමයි. 
-                    <br><br>
-                    මෙවැනි AI පද්ධති තවමත් පර්යේෂණ (Training) මට්ටමේ පවතින අතර ඉදිරියේදී වඩාත් නිවැරදි විද්‍යාත්මක දත්ත විශ්ලේෂණයන් ලබා ගැනීමට හැකි වනු ඇත. මෙය හුදෙක් ඔබගේ විනෝදාස්වාදය සඳහා පමණක් බව කරුණාවෙන් සලකන්න.
-                </p>
+            <div class="disclaimer-box">
+                <strong>⚠️ තාක්ෂණික හා විද්‍යාත්මක නිවේදනය:</strong><br>
+                විද්‍යාත්මකව බැලූ කල, මිනිස් අතේ රේඛා මඟින් අනාගතය 100% ක් නිවැරදිව ප්‍රකාශ කිරීමට කිසිදු තාක්ෂණයකට මෙතෙක් හැකියාවක් නැත. මෙහිදී අප භාවිතා කරන්නේ පවතින උසස්ම <strong>Palm Detection</strong> මාදිලියක් වන අතර, මෙම ප්‍රතිඵල හුදෙක් ඔබගේ විනෝදාස්වාදය සඳහා පමණක් බව කරුණාවෙන් සලකන්න.
             </div>
         </div>
-    </div>
 
-    <footer>VECTOR LAB AI | 2026 | EXHIBITION PROTOTYPE</footer>
+        <footer>VECTOR LAB AI | 2026 | PROFESSIONAL PROTOTYPE</footer>
+    </div>
 
     <script src="https://cdn.roboflow.com/0.2.26/roboflow.js"></script>
     <script>
         const video = document.getElementById("webcam");
         const canvas = document.getElementById("overlay");
         const ctx = canvas.getContext("2d");
+        const status = document.getElementById("status-indicator");
         const predictionBox = document.getElementById("prediction-text");
-        const statusText = document.getElementById("status-bar");
         const laser = document.getElementById("laser-line");
 
         const API_KEY = "rf_4tlgDCsTcah7rsFZTkKONHC3TXO2"; 
@@ -190,20 +213,37 @@
         const VERSION = 2;
 
         const fortunes = [
-            "ඔබ ඉතාමත් වාසනාවන්තයෙක්. ඉදිරි කාලය තුළ ඔබ නොසිතූ මූල්‍යමය වාසනාවක් හිමිවේවි! 💰",
-            "ඔබ ඉතාමත් කාරුණික හදවතක් ඇති අයෙක්. ඔබ කරන උදව් නිසා මේ වසරේ විශාල ජයග්‍රහණයක් ලැබේවි! 🌸",
-            "ඔබේ ආයුෂ රේඛාව ඉතා පැහැදිලියි. ඔබ ඉතා නිරෝගී සහ දීර්ඝ ජීවිතයක් භුක්ති විඳිනු ඇත! 💪",
-            "ඔබ ඉතා නිර්මාණශීලී කෙනෙක්. ඔබේ වෘත්තීය දක්ෂතාවලට ඉහළම පිළිගැනීමක් ඉක්මනින්ම ලැබෙනු ඇත! 🚀",
-            "ඔබට වාසනාවන්ත සංචාරක රේඛා පිහිටා තිබේ. නුදුරේදීම විදේශ සංචාරයකට අවස්ථාව ලැබේවි! ✈️",
-            "ඔබ දූරදර්ශී කෙනෙක්. ඔබ ගන්නා තීරණ නිසා ඔබේ පවුලට ඉදිරියේදී විශාල ආඩම්බරයක් හිමිවේවි! ✨"
+            "ඔබ ඉතාමත් වාසනාවන්තයෙක්. ඉදිරි මාස කිහිපය තුළ ඔබ නොසිතූ මූල්‍යමය වාසනාවක් හිමිවේවි! 💰",
+            "ඔබ ඉතාමත් කාරුණික හදවතක් ඇති අයෙක්. ඔබ අන් අයට කරන උදව් උපකාර නිසාම මේ වසරේ ඔබට විශාල ජයග්‍රහණයක් හිමිවනු ඇත! 🌸",
+            "ඔබේ ආයුෂ රේඛාව ඉතා පැහැදිලියි. ඔබ ඉතා නිරෝගී සහ දීර්ඝ ජීවිතයක් භුක්ති විඳින වාසනාවන්තයෙකි! 💪",
+            "ඔබ ඉතා නිර්මාණශීලී කෙනෙක්. කොරියාවේදී ඔබේ වෘත්තීය දක්ෂතාවලට ඉහළම පිළිගැනීමක් ඉක්මනින්ම ලැබෙනු ඇත! 🚀",
+            "ඔබට ඉතාමත් වාසනාවන්ත සංචාරක රේඛා පිහිටා තිබේ. නුදුරේදීම විදේශ සංචාරයකට ඔබට අවස්ථාව ලැබේවි! ✈️",
+            "ඔබ ඉතාමත් දූරදර්ශී කෙනෙක්. ඔබ ගන්නා තීරණ නිසා ඔබේ පවුලේ සැමට ඉදිරියේදී විශාල ආඩම්බරයක් හිමිවීමට නියමිතයි! ✨"
         ];
 
         let isAnalyzing = false;
 
-        navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-            video.srcObject = stream;
-            runAI();
-        });
+        window.onload = () => {
+            setTimeout(() => {
+                document.getElementById("loader").style.display = "none";
+                const app = document.getElementById("app");
+                app.style.display = "flex";
+                setTimeout(() => app.style.opacity = "1", 50);
+                startCamera();
+            }, 3000);
+        };
+
+        function startCamera() {
+            navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720, facingMode: "user" } })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.onloadedmetadata = () => {
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        runAI();
+                    };
+                });
+        }
 
         function runAI() {
             roboflow.auth({ publishable_key: API_KEY }).load({ model: MODEL_ID, version: VERSION })
@@ -211,47 +251,60 @@
                     setInterval(() => {
                         if (isAnalyzing) return;
                         
-                        // model.execute වෙනුවට model.detect භාවිතා කර ඇත
+                        // මෙහිදී model.detect භාවිතා කිරීමෙන් console error එක විසඳේ
                         model.detect(video).then(predictions => {
                             ctx.clearRect(0, 0, canvas.width, canvas.height);
-                            
                             if (predictions.length > 0) {
-                                const palm = predictions[0];
-                                
-                                // Boundary Box ඇඳීම
-                                ctx.strokeStyle = "#00f2ff";
-                                ctx.lineWidth = 4;
-                                ctx.strokeRect(palm.bbox.x, palm.bbox.y, palm.bbox.width, palm.bbox.height);
-
-                                if (palm.confidence > 0.75) {
-                                    startAnalysis(palm.bbox);
+                                let palm = predictions[0];
+                                if(palm.confidence > 0.65) {
+                                    ctx.strokeStyle = "#00f2ff";
+                                    ctx.lineWidth = 4;
+                                    ctx.strokeRect(palm.bbox.x, palm.bbox.y, palm.bbox.width, palm.bbox.height);
+                                    triggerAnalysis();
                                 }
                             }
-                        });
+                        }).catch(e => { console.log("System syncing..."); });
                     }, 500);
                 });
         }
 
-        function startAnalysis(bbox) {
+        function triggerAnalysis() {
             isAnalyzing = true;
             laser.style.display = "block";
-            statusText.innerHTML = "● ANALYZING DERMAL PATTERNS...";
-            predictionBox.innerHTML = "අල්ල නිසලව තබා ගන්න...";
+            status.innerHTML = "● ANALYZING: SCANNING DERMAL PATTERNS...";
+            status.style.color = "#ffdd57";
+            predictionBox.innerHTML = "කරුණාකර අල්ල නිසලව තබා ගන්න...";
 
-            // එකම අතට එකම ප්‍රතිඵලය ලැබීමට Hashing භාවිතා කරයි
-            const hashIndex = Math.floor((bbox.x + bbox.y + bbox.width) % fortunes.length);
+            const stages = [
+                "● PROCESSING: READING LIFE LINE...",
+                "● PROCESSING: IDENTIFYING WEALTH NODES...",
+                "● PROCESSING: CORRELATING POSITIVE DATASETS..."
+            ];
 
-            setTimeout(() => {
-                predictionBox.innerHTML = fortunes[hashIndex];
-                statusText.innerHTML = "● ANALYSIS COMPLETE";
-                laser.style.display = "none";
-                
-                setTimeout(() => { 
-                    isAnalyzing = false; 
-                    statusText.innerHTML = "● SYSTEM READY";
-                    predictionBox.innerHTML = "අනාගතය දැනගැනීමට අල්ල පෙන්වන්න...";
-                }, 12000); 
-            }, 4000);
+            let i = 0;
+            const interval = setInterval(() => {
+                if(i < stages.length) {
+                    status.innerHTML = stages[i];
+                    i++;
+                } else {
+                    clearInterval(interval);
+                    showResult();
+                }
+            }, 1600);
+        }
+
+        function showResult() {
+            const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
+            predictionBox.innerHTML = randomFortune;
+            status.innerHTML = "● ANALYSIS COMPLETE";
+            status.style.color = "#00f2ff";
+            laser.style.display = "none";
+            
+            setTimeout(() => { 
+                isAnalyzing = false; 
+                status.innerHTML = "● SYSTEM READY: SCAN FOR INSIGHTS";
+                predictionBox.innerHTML = "ඊළඟ පරීක්ෂාව සඳහා අල්ල පෙන්වන්න...";
+            }, 15000);
         }
     </script>
 </body>
