@@ -3,224 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Elephant Game | Bakmaha 2026</title>
+    <title>AI Elephant Game | Mobile</title>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
     
     <style>
-        :root {
-            --gold: #ffdd57;
-            --neon-green: #39ff14;
-            --dark-bg: #0a0a0a;
+        :root { --gold: #ffcc00; --neon: #39ff14; --dark: #0a0a0a; }
+        
+        body { 
+            margin: 0; background: var(--dark); color: #fff; 
+            font-family: 'Segoe UI', sans-serif; 
+            display: flex; flex-direction: column; align-items: center;
+            height: 100vh; overflow: hidden;
         }
 
-        body {
-            margin: 0;
-            background: var(--dark-bg);
-            color: #fff;
-            font-family: 'Segoe UI', 'Identity-Sinhala', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow: hidden;
-            height: 100vh;
-        }
-
-        /* Festival Header */
+        /* 1. Mobile Optimized Header */
         .main-header {
-            background: var(--gold);
-            color: #000;
-            width: 100%;
-            text-align: center;
-            padding: 12px 0;
-            font-weight: 900;
-            font-size: 20px;
-            box-shadow: 0 4px 20px rgba(255, 221, 87, 0.4);
+            background: var(--gold); color: #000; width: 100%;
+            text-align: center; padding: 15px 0; font-weight: 900;
+            font-size: 1.2rem; box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
         }
 
-        .highlight-title {
-            font-size: 18px;
-            color: var(--neon-green);
-            margin: 15px 0 5px 0;
-            font-weight: bold;
+        .instruction {
+            color: var(--neon); font-size: 0.9rem; margin: 15px 10px;
+            font-weight: bold; text-align: center; line-height: 1.4;
         }
 
-        /* Game Area with your Elephant Image */
+        /* 2. Game Area - Phone Size (Responsive) */
         #game-area {
             position: relative;
-            width: 700px;
-            height: 500px;
-            margin: 10px auto;
-            background: #fff url('image_3.png') no-repeat center;
+            width: 92vw; height: 55vh; /* ෆෝන් එකේ උසට ගැළපෙන සේ */
+            background: #fff url('image_56b09e.jpg') no-repeat center;
             background-size: contain;
-            border: 5px solid #333;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
-            cursor: none; /* Mouse Cursor එක සඟවන්න */
+            border: 3px solid #333; border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
 
-        /* Target Point (අලියාගේ ඇස තිබිය යුතු තැන) */
+        /* 3. Correct Eye Position (අලියාගේ ඇස උඩටම) */
         #target {
             position: absolute;
-            width: 18px;
-            height: 18px;
+            width: 12px; height: 12px;
             background: rgba(255, 0, 0, 0.4);
             border-radius: 50%;
-            top: 295px; /* image_3.png හි ඇස ඇති තැනට අනුව සකසා ඇත */
-            left: 505px;
+            /* පින්තූරයේ ඇස ඇති තැන (මේ අගයන් image_56b09e.jpg ට ගැළපේ) */
+            top: 31%; left: 71%; 
             border: 2px dashed red;
-            transition: background 0.2s ease;
+            transform: translate(-50%, -50%);
         }
 
-        /* Moving Eye Cursor (ඇඟිල්ල සමඟ යන ඇස) */
         #eye-cursor {
             position: absolute;
-            width: 40px;
-            height: 40px;
+            width: 30px; height: 30px;
             background: url('https://cdn-icons-png.flaticon.com/512/595/595053.png') no-repeat center;
             background-size: contain;
-            pointer-events: none;
-            z-index: 100;
-            filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
-            transition: transform 0.1s ease-out;
-        }
-
-        /* Game Status/Message */
-        .game-status {
-            text-align: center;
-            margin-top: 10px;
-            font-size: 22px;
-            font-weight: bold;
-            color: var(--gold);
-            min-height: 30px;
-        }
-
-        #pts-display { color: var(--neon-green); font-size: 16px; margin-top: 5px; }
-
-        /* Restart Button */
-        #restart-btn {
+            pointer-events: none; z-index: 100;
             display: none;
-            padding: 10px 25px;
-            background: var(--neon-green);
-            border: none;
-            border-radius: 12px;
-            font-weight: bold;
-            color: #000;
-            cursor: pointer;
-            margin-top: 15px;
-            font-size: 16px;
         }
 
-        /* Hidden Webcam for Tracking */
-        #webcam { display: none; }
+        .status-box { margin-top: 15px; font-size: 1.1rem; font-weight: bold; color: var(--gold); }
         
-        .footer-branding { position: absolute; bottom: 15px; font-size: 11px; color: #555; letter-spacing: 1px; }
+        #restart-btn {
+            margin-top: 10px; padding: 12px 25px; 
+            background: var(--neon); border: none; border-radius: 30px;
+            font-weight: bold; display: none;
+        }
+
+        #webcam { display: none; }
+        .footer { position: absolute; bottom: 10px; font-size: 10px; color: #444; }
     </style>
 </head>
 <body>
 
-    <div class="main-header">🌸 කීමේ බක්මහ උළෙල - 2026 | AI අලියාට ඇස තැබීම 🐘</div>
+    <div class="main-header">🌸 කීමේ බක්මහ උළෙල - 2026 🌸</div>
     
-    <div class="highlight-title">දබර ඇඟිල්ල ඔසවා "ඇස" නියම තැනට ගෙන යන්න!</div>
+    <div class="instruction">
+        ඔබේ සිනහව වගේම ඇස් පෙනීමත් හොඳද? <br>
+        දබර ඇඟිල්ලෙන් ඇස ගෙන ගොස් අලියාට තබන්න!
+    </div>
 
     <div id="game-area">
         <div id="target"></div>
         <div id="eye-cursor"></div>
-        <video id="webcam" autoplay playsinline></video>
+        <video id="webcam"></video>
     </div>
 
-    <div class="game-status" id="status">පද්ධතිය පණගැන්වෙමින් පවතී...</div>
-    <div id="pts-display">ලකුණු: <span id="pts-value">0</span></div>
+    <div class="status-box" id="msg">පද්ධතිය සූදානම් වෙමින්...</div>
+    <button id="restart-btn" onclick="location.reload()">නැවත උත්සාහ කරන්න 🔄</button>
 
-    <button id="restart-btn" onclick="location.reload()">නැවත සෙල්ලම් කරන්න 🔄</button>
-
-    <div class="footer-branding">Presented by VECTOR LABS AI × E9 SHOP</div>
+    <div class="footer">PRESENTED BY VECTOR LABS AI × E9 SHOP</div>
 
     <script type="module">
-        const eyeCursor = document.getElementById('eye-cursor');
+        const eye = document.getElementById('eye-cursor');
         const target = document.getElementById('target');
-        const status = document.getElementById('status');
-        const ptsValue = document.getElementById('pts-value');
-        const gameArea = document.getElementById('game-area');
-        const restartBtn = document.getElementById('restart-btn');
+        const msg = document.getElementById('msg');
+        const area = document.getElementById('game-area');
+        const btn = document.getElementById('restart-btn');
 
-        let successCounter = 0;
-        let isGameWon = false;
+        let count = 0;
+        let won = false;
 
         function onResults(results) {
-            if (isGameWon || !results.multiHandLandmarks) return;
+            if (won) return;
             
-            status.innerText = "දබර ඇඟිල්ලෙන් ඇස නියම තැනට ගෙන යන්න...";
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                eye.style.display = 'block';
+                msg.innerText = "නියමයි! දැන් ඇස තැනට ගෙන යන්න...";
+                
+                const tip = results.multiHandLandmarks[0][8];
+                const x = (1 - tip.x) * area.offsetWidth;
+                const y = tip.y * area.offsetHeight;
 
-            if (results.multiHandLandmarks.length > 0) {
-                // දබර ඇඟිල්ලේ කෙළවර (Index Finger Tip - Point 8)
-                const indexTip = results.multiHandLandmarks[0][8];
+                eye.style.left = `${x - 15}px`;
+                eye.style.top = `${y - 15}px`;
 
-                // Screen coordinates වලට හැරවීම (Mirror view නිසා 1-x ගනී)
-                const x = (1 - indexTip.x) * gameArea.offsetWidth;
-                const y = indexTip.y * gameArea.offsetHeight;
+                // දුර මැනීම
+                const tx = target.offsetLeft;
+                const ty = target.offsetTop;
+                const dist = Math.sqrt(Math.pow(x - tx, 2) + Math.pow(y - ty, 2));
 
-                // Moving Eye එක චලනය කිරීම
-                eyeCursor.style.left = `${x - 20}px`;
-                eyeCursor.style.top = `${y - 20}px`;
-
-                checkCollision(x, y);
-            } else {
-                eyeCursor.style.display = "none";
-            }
-        }
-
-        function checkCollision(x, y) {
-            // Target එකේ මැද ලක්ෂ්‍යය (Relative to game-area)
-            const tx = target.offsetLeft + 9; // Target width/2
-            const ty = target.offsetTop + 9;  // Target height/2
-
-            // ඇඟිල්ල සහ target එක අතර දුර මැනීම (Distance calculation)
-            const dist = Math.sqrt(Math.pow(x - tx, 2) + Math.pow(y - ty, 2));
-
-            if (dist < 28) { // ඇසට ආසන්නව ඇති විට (Collision zone)
-                successCounter++;
-                target.style.background = "rgba(0, 255, 0, 0.5)";
-                ptsValue.innerText = successCounter;
-
-                if (successCounter > 45) { // තත්පර 1.5ක් පමණ ස්ථාවරව තබාගත යුතුය
-                    isGameWon = true;
-                    status.innerHTML = "🎉 ජයග්‍රහණය කළා! නිවැරදිව ඇස තැබුවා! 🏆";
-                    status.style.color = "#39ff14";
-                    target.style.background = "rgba(0, 255, 0, 0.7)";
-                    restartBtn.style.display = "block";
-                    eyeCursor.style.display = "none"; // ජයග්‍රහණය කළ පසු cursor එක සඟවන්න
+                if (dist < 20) {
+                    count++;
+                    target.style.background = "rgba(57, 255, 20, 0.6)";
+                    if (count > 30) {
+                        won = true;
+                        msg.innerText = "🎉 සුපිරි! ඔබ ජයග්‍රහණය කළා! 🏆";
+                        msg.style.color = "#39ff14";
+                        btn.style.display = "block";
+                        eye.style.display = "none";
+                    }
+                } else {
+                    count = 0;
+                    target.style.background = "rgba(255, 0, 0, 0.4)";
                 }
-            } else {
-                successCounter = 0;
-                ptsValue.innerText = "0";
-                target.style.background = "rgba(255, 0, 0, 0.4)";
-                eyeCursor.style.display = "block";
             }
         }
 
-        const hands = new Hands({
-            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
-        });
-
-        hands.setOptions({
-            maxNumHands: 1,
-            modelComplexity: 1,
-            minDetectionConfidence: 0.75,
-            minTrackingConfidence: 0.75
-        });
-
+        const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6 });
         hands.onResults(onResults);
 
         const camera = new Camera(document.getElementById('webcam'), {
-            onFrame: async () => {
-                await hands.send({image: document.getElementById('webcam')});
-            },
-            width: 640,
-            height: 480
+            onFrame: async () => { await hands.send({image: document.getElementById('webcam')}); },
+            width: 480, height: 640
         });
-        camera.start();
+        camera.start().then(() => { msg.innerText = "කැමරාව ඉදිරියට අත පෙන්වන්න..."; });
     </script>
 </body>
 </html>
