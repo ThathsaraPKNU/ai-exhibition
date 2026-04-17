@@ -3,77 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google AI Object Detector</title>
+    <title>AI Eye | Object Detector 2026</title>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+    
     <style>
-        body { margin: 0; background: #000; color: #00f2ff; font-family: sans-serif; text-align: center; }
-        #video-container { position: relative; width: 100%; max-width: 500px; margin: auto; }
-        video, canvas { position: absolute; left: 0; top: 0; width: 100%; border-radius: 15px; }
-        .status { margin-top: 380px; padding: 20px; font-size: 20px; font-weight: bold; }
+        :root {
+            --neon-green: #39ff14;
+            --dark-bg: #050505;
+            --highlight: #ffdd57;
+        }
+
+        body {
+            margin: 0;
+            background: var(--dark-bg);
+            color: #fff;
+            font-family: 'Segoe UI', 'Identity-Sinhala', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Highlighted Festival Header */
+        .aurudu-header {
+            background: var(--highlight);
+            color: #000;
+            width: 100%;
+            text-align: center;
+            padding: 10px 0;
+            font-weight: 900;
+            font-size: 18px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(255, 221, 87, 0.4);
+            z-index: 100;
+        }
+
+        .main-title {
+            font-size: 20px;
+            color: var(--neon-green);
+            margin: 15px 0;
+            text-shadow: 0 0 8px var(--neon-green);
+            font-weight: 800;
+        }
+
+        /* Camera Viewport Area */
+        #container {
+            position: relative;
+            width: 92vw;
+            height: 62vh;
+            border: 3px solid #333;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #000;
+            box-shadow: 0 0 25px rgba(0,0,0,0.5);
+        }
+
+        video, canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Status & Item Info */
+        .bottom-panel {
+            width: 100%;
+            text-align: center;
+            padding: 15px;
+        }
+
+        .status-bar {
+            font-size: 12px;
+            color: #888;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        #item-info {
+            font-size: 26px;
+            font-weight: bold;
+            color: var(--highlight);
+            text-shadow: 0 0 10px rgba(255, 221, 87, 0.3);
+        }
+
+        footer {
+            position: absolute;
+            bottom: 10px;
+            font-size: 10px;
+            color: #444;
+            letter-spacing: 1px;
+        }
     </style>
 </head>
 <body>
 
-    <h2>Google AI භාණ්ඩ හඳුනාගැනීම</h2>
+    <div class="aurudu-header">🌸 කීමේ අවුරුදු උත්සවය - 2026 🌸</div>
     
-    <div id="video-container">
+    <h1 class="main-title">AI ඇස: බුද්ධිමත් භාණ්ඩ හඳුනාගැනීම</h1>
+
+    <div id="container">
         <video id="webcam" autoplay playsinline muted></video>
         <canvas id="overlay"></canvas>
     </div>
 
-    <div class="status" id="label">පද්ධතිය සූදානම් වෙමින් පවතී...</div>
+    <div class="bottom-panel">
+        <div class="status-bar" id="status">පද්ධතිය පණගැන්වෙමින් පවතී...</div>
+        <div id="item-info">කැමරාව යොමු කරන්න</div>
+    </div>
+
+    <footer>SIYAL ACADEMY | VECTOR LAB AI</footer>
 
     <script>
         const video = document.getElementById('webcam');
         const canvas = document.getElementById('overlay');
         const ctx = canvas.getContext('2d');
-        const label = document.getElementById('label');
+        const statusText = document.getElementById('status');
+        const itemInfo = document.getElementById('item-info');
 
+        // COCO-SSD මාදිලියට හඳුනාගත හැකි භාණ්ඩ 80ම සිංහලෙන්
         const translations = {
-            'cell phone': 'ජංගම දුරකථනය 📱',
-            'bottle': 'බෝතලය 🍼',
-            'person': 'පුද්ගලයා 👤',
-            'backpack': 'බෑගය 🎒',
-            'cup': 'කෝප්පය ☕',
-            'laptop': 'ලැප්ටොප් එක 💻'
+            'person': 'පුද්ගලයා 👤', 'bicycle': 'බයිසිකලය 🚲', 'car': 'මෝටර් රථය 🚗', 'motorcycle': 'මෝටර් සයිකලය 🏍️',
+            'airplane': 'ගුවන් යානය ✈️', 'bus': 'බස් රථය 🚌', 'train': 'කෝච්චිය 🚆', 'truck': 'ලොරිය 🚛',
+            'boat': 'බෝට්ටුව 🚢', 'traffic light': 'සංඥා පුවරුව 🚥', 'fire hydrant': 'ජල කරාමය 🚒', 'stop sign': 'නැවතුම් සලකුණ 🛑',
+            'parking meter': 'ගාල් කිරීමේ මීටරය 🅿️', 'bench': 'බංකුව 🪑', 'bird': 'කුරුල්ලා 🐦', 'cat': 'පූසා 🐈',
+            'dog': 'බල්ලා 🐕', 'horse': 'අශ්වයා 🐎', 'sheep': 'බැටළුවා 🐑', 'cow': 'එළදෙන 🐄',
+            'elephant': 'අලියා 🐘', 'bear': 'වලහා 🐻', 'zebra': 'සීබ්‍රා 🦓', 'giraffe': 'ගිරාෆ් 🦒',
+            'backpack': 'බෑගය 🎒', 'umbrella': 'කුඩය ☂️', 'handbag': 'අත් බෑගය 👜', 'tie': 'ටයි පටිය 👔',
+            'suitcase': 'ගමන් මල්ල 🧳', 'frisbee': 'තැටිය 🥏', 'skis': 'ස්කී ලී ⛷️', 'snowboard': 'ස්නෝබෝඩ් 🏂',
+            'sports ball': 'පන්දුව ⚽', 'kite': 'සරුංගලය 🪁', 'baseball bat': 'පිත්ත ⚾', 'baseball glove': 'අත්වැසුම ⚾',
+            'skateboard': 'ස්කේට්බෝඩ් 🛹', 'surfboard': 'සර්ෆ්බෝඩ් 🏄', 'tennis racket': 'ටෙනිස් පිත්ත 🎾', 'bottle': 'බෝතලය 🍼',
+            'wine glass': 'වයින් වීදුරුව 🍷', 'cup': 'කෝප්පය ☕', 'fork': 'ගෑරුප්පුව 🍴', 'knife': 'පිහිය 🔪',
+            'spoon': 'හැන්ද 🥄', 'bowl': 'බඳුන 🥣', 'banana': 'කෙසෙල් 🍌', 'apple': 'ඇපල් 🍎',
+            'sandwich': 'සැන්ඩ්විච් 🥪', 'orange': 'දොඩම් 🍊', 'broccoli': 'බ්‍රොකෝලි 🥦', 'carrot': 'කැරට් 🥕',
+            'hot dog': 'හොට් ඩෝග් 🌭', 'pizza': 'පීසා 🍕', 'donut': 'ඩෝනට් 🍩', 'cake': 'කේක් 🍰',
+            'chair': 'පුටුව 🪑', 'couch': 'සෝෆාව 🛋️', 'potted plant': 'මල් පෝච්චිය 🪴', 'bed': 'ඇඳ 🛏️',
+            'dining table': 'කෑම මේසය 🍽️', 'toilet': 'වැසිකිළිය 🚽', 'tv': 'රූපවාහිනිය 📺', 'laptop': 'ලැප්ටොප් එක 💻',
+            'mouse': 'මවුස් එක 🖱️', 'remote': 'රිමෝට් එක 📺', 'keyboard': 'යතුරුපුවරුව ⌨️', 'cell phone': 'ජංගම දුරකථනය 📱',
+            'microwave': 'මයික්‍රෝවේව් උඳුන 🍞', 'oven': 'උඳුන 🍳', 'toaster': 'ටෝස්ටරය 🍞', 'sink': 'සින්ක් එක 🚰',
+            'refrigerator': 'ශීතකරණය ❄️', 'book': 'පොත 📖', 'clock': 'ඔරලෝසුව ⏰', 'vase': 'මල් වාසය 🏺',
+            'scissors': 'කතුර ✂️', 'teddy bear': 'ටෙඩී බෙයාර් 🧸', 'hair drier': 'හෙයාර් ඩ්‍රයර් 💨', 'toothbrush': 'දත් බුරුසුව 🪥'
         };
 
-        // කැමරාව පණගැන්වීම
-        navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-            video.srcObject = stream;
-            video.onloadedmetadata = () => {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                loadGoogleModel();
-            };
-        });
+        async function startApp() {
+            try {
+                // Back Camera Access
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "environment" }, 
+                    audio: false 
+                });
+                video.srcObject = stream;
 
-        async function loadGoogleModel() {
-            // Google Pre-trained Model එක Load කිරීම
-            const model = await cocoSsd.load();
-            label.innerText = "භාණ්ඩයක් පෙන්වන්න...";
-            
-            predict(model);
+                statusText.innerText = "Google AI පද්ධතිය භාගත වෙමින් පවතී...";
+                const model = await cocoSsd.load();
+                
+                statusText.innerText = "● පද්ධතිය සක්‍රියයි";
+                video.onloadedmetadata = () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    detect(model);
+                };
+            } catch (err) {
+                statusText.innerText = "කැමරා අවසරය ලබා දීමට නොහැක!";
+                alert("කරුණාකර කැමරාව භාවිතා කිරීමට අවසර ලබා දෙන්න.");
+            }
         }
 
-        async function predict(model) {
+        async function detect(model) {
             const predictions = await model.detect(video);
+            
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (predictions.length > 0) {
+                predictions.forEach(p => {
+                    if (p.score > 0.6) {
+                        const [x, y, width, height] = p.bbox;
+                        const label = translations[p.class] || p.class;
 
-            predictions.forEach(p => {
-                if (p.score > 0.6) {
-                    ctx.strokeStyle = "#00f2ff";
-                    ctx.lineWidth = 4;
-                    ctx.strokeRect(p.bbox[0], p.bbox[1], p.bbox[2], p.bbox[3]);
-                    
-                    const sinhalaName = translations[p.class] || p.class;
-                    label.innerText = sinhalaName;
-                }
-            });
+                        // 1. භාණ්ඩය වටා කොටුවක් ඇඳීම
+                        ctx.strokeStyle = "#39ff14";
+                        ctx.lineWidth = 5;
+                        ctx.strokeRect(x, y, width, height);
 
-            requestAnimationFrame(() => predict(model));
+                        // 2. කොටුව අසලම නම ඇඳීම
+                        ctx.fillStyle = "#39ff14";
+                        ctx.font = "bold 22px Segoe UI";
+                        // නම කොටුවට උඩින් පෙන්වීමට උස පරීක්ෂා කරයි
+                        const labelY = y > 30 ? y - 10 : y + 30;
+                        ctx.fillText(label, x, labelY);
+
+                        // 3. පහළ තීරුවේ නම පෙන්වීම
+                        itemInfo.innerText = label;
+                    }
+                });
+            } else {
+                itemInfo.innerText = "භාණ්ඩයක් පෙන්වන්න...";
+            }
+
+            requestAnimationFrame(() => detect(model));
         }
+
+        startApp();
     </script>
 </body>
 </html>
