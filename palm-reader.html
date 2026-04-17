@@ -23,7 +23,6 @@
             min-height: 100vh;
         }
 
-        /* Startup Loader */
         #loader {
             position: fixed;
             inset: 0;
@@ -42,12 +41,10 @@
             border-top: 3px solid var(--neon-cyan);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            box-shadow: 0 0 15px var(--neon-cyan);
         }
 
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* Main App Interface */
         #app {
             display: none;
             opacity: 0;
@@ -64,25 +61,31 @@
             text-align: center;
         }
 
-        .title {
-            font-size: 26px;
+        .main-topic {
+            font-size: 32px;
             font-weight: 800;
             color: var(--neon-yellow);
             text-transform: uppercase;
-            letter-spacing: 3px;
-            text-shadow: 0 0 15px rgba(255, 221, 87, 0.5);
+            letter-spacing: 2px;
             margin: 0;
+            text-shadow: 0 0 15px rgba(255, 221, 87, 0.4);
         }
 
-        /* Scanner Viewport */
+        .sub-topic {
+            font-size: 16px;
+            color: var(--neon-cyan);
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
+
         #viewport-container {
             position: relative;
             margin: 20px auto;
             width: fit-content;
             border-radius: 25px;
-            border: 4px solid #222;
+            border: 5px solid #222;
             overflow: hidden;
-            box-shadow: 0 0 40px rgba(0, 242, 255, 0.1);
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.15);
         }
 
         video {
@@ -90,7 +93,6 @@
             width: 100%;
             max-width: 640px;
             transform: scaleX(-1);
-            filter: brightness(1.1) contrast(1.1);
         }
 
         canvas {
@@ -99,11 +101,10 @@
             transform: scaleX(-1);
         }
 
-        /* Scanning Line Animation */
         #laser-line {
             position: absolute;
             width: 100%;
-            height: 3px;
+            height: 4px;
             background: var(--neon-cyan);
             box-shadow: 0 0 20px var(--neon-cyan);
             top: 0;
@@ -118,60 +119,53 @@
             100% { top: 100%; opacity: 0; }
         }
 
-        /* Results Panel */
         .info-panel {
             padding: 0 20px 20px;
-            max-width: 700px;
+            max-width: 750px;
             margin: 0 auto;
             text-align: center;
         }
 
         #status-indicator {
-            font-size: 13px;
+            font-size: 14px;
             color: var(--neon-cyan);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             font-weight: bold;
+            letter-spacing: 1px;
         }
 
         #prediction-text {
             background: var(--panel-bg);
-            border: 1px solid rgba(255, 221, 87, 0.3);
-            border-radius: 18px;
-            padding: 25px;
-            font-size: 22px;
+            border: 2px solid rgba(255, 221, 87, 0.4);
+            border-radius: 20px;
+            padding: 30px;
+            font-size: 24px;
             color: var(--neon-yellow);
-            font-weight: 600;
-            min-height: 80px;
+            font-weight: 700;
+            min-height: 100px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            line-height: 1.5;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
 
-        /* Scientific Disclaimer Section */
         .disclaimer-box {
             margin-top: 30px;
             padding: 20px;
             background: rgba(255,255,255,0.03);
             border-radius: 15px;
-            font-size: 11.5px;
-            color: #999;
+            font-size: 12px;
+            color: #aaa;
             text-align: justify;
             line-height: 1.7;
-            border: 1px solid #222;
+            border: 1px solid #333;
         }
 
-        .disclaimer-box strong { color: #ccc; }
-
         footer {
-            padding: 15px;
-            font-size: 11px;
-            color: #444;
+            padding: 20px;
+            font-size: 12px;
+            color: #555;
             text-align: center;
-            letter-spacing: 1px;
         }
     </style>
 </head>
@@ -179,13 +173,13 @@
 
     <div id="loader">
         <div class="loader-ring"></div>
-        <p style="color: var(--neon-cyan); margin-top: 20px; font-family: monospace; letter-spacing: 2px;">SECURE BIO-LINK ESTABLISHED...</p>
+        <p style="color: var(--neon-cyan); margin-top: 20px; font-family: monospace;">සම්බන්ධතාවය ස්ථාපිත කරමින්...</p>
     </div>
 
     <div id="app">
         <header>
-            <h1 class="title">🔮 AI Palm Fortune Analyst</h1>
-            <div style="font-size: 12px; color: #555; margin-top: 5px;">KIME BAKMAHA ULELE 2026 | TECH EXHIBITION</div>
+            <h1 class="main-topic">🔮 AI හස්ත රේඛා පරීක්ෂාව</h1>
+            <div class="sub-topic">2026 කිමේ බක්මහ උළෙල - තාක්ෂණික ප්‍රදර්ශනය</div>
         </header>
 
         <div id="viewport-container">
@@ -195,17 +189,17 @@
         </div>
 
         <div class="info-panel">
-            <div id="status-indicator">● SYSTEM READY: SCAN FOR INSIGHTS</div>
-            <div id="prediction-text">කරුණාකර ඔබේ අල්ල කැමරාවට පෙන්වන්න...</div>
+            <div id="status-indicator">● පද්ධතිය සූදානම්: කරුණාකර අල්ල පෙන්වන්න</div>
+            <div id="prediction-text">ඔබේ අනාගතය දැනගැනීමට අල්ල Scan කරන්න...</div>
 
             <div class="disclaimer-box">
                 <strong>⚠️ තාක්ෂණික හා විද්‍යාත්මක නිවේදනය:</strong><br>
-                විද්‍යාත්මකව බැලූ කල, මිනිස් අතේ රේඛා මඟින් අනාගතය 100% ක් නිවැරදිව ප්‍රකාශ කිරීමට කිසිදු තාක්ෂණයකට මෙතෙක් හැකියාවක් නැත. මෙහිදී අප භාවිතා කරන්නේ පවතින උසස්ම <strong>Palm Detection</strong> මාදිලියක් වන අතර, මෙවැනි AI පද්ධති තවමත් ලොව පුරා පර්යේෂණ මට්ටමේ පවතී. කෙසේ වෙතත්, තාක්ෂණයේ වේගවත් දියුණුවත් සමඟ ඉදිරියේදී මීට වඩා නිවැරදි විද්‍යාත්මක දත්ත විශ්ලේෂණයන් ලබා ගැනීමට හැකි වනු ඇතැයි අපි විශ්වාස කරමු. මෙම ප්‍රතිඵල හුදෙක් ඔබගේ විනෝදාස්වාදය සඳහා පමණක් බව කරුණාවෙන් සලකන්න.
+                විද්‍යාත්මකව බැලූ කල, මිනිස් අතේ රේඛා මඟින් අනාගතය 100% ක් නිවැරදිව ප්‍රකාශ කිරීමට කිසිදු තාක්ෂණයකට මෙතෙක් හැකියාවක් නැත. මෙහිදී අප භාවිතා කරන්නේ පවතින උසස්ම <strong>Palm Detection</strong> මාදිලියක් වන අතර, මෙවැනි AI පද්ධති තවමත් ලොව පුරා පර්යේෂණ (Training) මට්ටමේ පවතී. ඉදිරියේදී කෘතිම බුද්ධිය හරහා වඩාත් නිවැරදි විද්‍යාත්මක දත්ත විශ්ලේෂණයන් ලබා ගැනීමට හැකි වනු ඇතැයි අපි විශ්වාස කරමු. මෙම ප්‍රතිඵල හුදෙක් ඔබගේ විනෝදාස්වාදය (Entertainment) සඳහා පමණක් බව කරුණාවෙන් සලකන්න.
             </div>
         </div>
 
         <footer>
-            VECTOR LAB AI | 2026 | PROFESSIONAL PROTOTYPE
+            VECTOR LAB AI | 2026 | EXHIBITION PROTOTYPE
         </footer>
     </div>
 
@@ -218,18 +212,17 @@
         const predictionBox = document.getElementById("prediction-text");
         const laser = document.getElementById("laser-line");
 
-        // උසස්ම නිරවද්‍යතාවය සහිත Model එක (97.0% Precision)
         const API_KEY = "rf_4tlgDCsTcah7rsFZTkKONHC3TXO2"; 
         const MODEL_ID = "palm-detection-qvrsc"; 
         const VERSION = 2;
 
         const fortunes = [
-            "ඔබ ඉතාමත් වාසනාවන්තයෙක්. ඉදිරි මාස කිහිපය තුළ ඔබ නොසිතූ මූල්‍යමය වාසනාවක් හිමිවේවි! 💰",
-            "ඔබ ඉතාමත් කාරුණික හදවතක් ඇති අයෙක්. ඔබ අන් අයට කරන උදව් උපකාර නිසාම මේ වසරේ ඔබට විශාල ජයග්‍රහණයක් හිමිවනු ඇත! 🌸",
+            "ඔබ ඉතාමත් වාසනාවන්තයෙක්. ඉදිරි කාලය තුළ ඔබ නොසිතූ මූල්‍යමය වාසනාවක් හිමිවේවි! 💰",
+            "ඔබ ඉතාමත් කාරුණික හදවතක් ඇති අයෙක්. ඔබ කරන උදව් උපකාර නිසාම මේ වසරේ විශාල ජයග්‍රහණයක් හිමිවේවි! 🌸",
             "ඔබේ ආයුෂ රේඛාව ඉතා පැහැදිලියි. ඔබ ඉතා නිරෝගී සහ දීර්ඝ ජීවිතයක් භුක්ති විඳින වාසනාවන්තයෙකි! 💪",
-            "ඔබ ඉතා නිර්මාණශීලී කෙනෙක්. කොරියාවේදී ඔබේ වෘත්තීය දක්ෂතාවලට ඉහළම පිළිගැනීමක් ඉක්මනින්ම ලැබෙනු ඇත! 🚀",
+            "ඔබ ඉතා නිර්මාණශීලී කෙනෙක්. ඔබේ වෘත්තීය දක්ෂතාවලට ඉහළම පිළිගැනීමක් ඉක්මනින්ම ලැබෙනු ඇත! 🚀",
             "ඔබට ඉතාමත් වාසනාවන්ත සංචාරක රේඛා පිහිටා තිබේ. නුදුරේදීම විදේශ සංචාරයකට ඔබට අවස්ථාව ලැබේවි! ✈️",
-            "ඔබ ඉතාමත් දූරදර්ශී කෙනෙක්. ඔබ ගන්නා තීරණ නිසා ඔබේ පවුලේ සැමට ඉදිරියේදී විශාල ආඩම්බරයක් හිමිවීමට නියමිතයි! ✨"
+            "ඔබ ඉතාමත් දූරදර්ශී කෙනෙක්. ඔබ ගන්නා තීරණ නිසා ඔබේ පවුලේ සැමට ඉදිරියේදී විශාල ආඩම්බරයක් හිමිවේවි! ✨"
         ];
 
         let isAnalyzing = false;
@@ -240,7 +233,7 @@
                 document.getElementById("app").style.display = "flex";
                 document.getElementById("app").style.opacity = "1";
                 startCamera();
-            }, 3000);
+            }, 2500);
         };
 
         function startCamera() {
@@ -252,8 +245,13 @@
                         canvas.height = video.videoHeight;
                         runAI();
                     };
-                })
-                .catch(err => console.error("Camera access denied:", err));
+                });
+        }
+
+        // එකම අතට එකම දේ ලැබීමට "Deterministic Hashing" භාවිතා කරන ලදී
+        function getStableFortune(bbox) {
+            const hash = Math.floor((bbox.x + bbox.y + bbox.width + bbox.height) % fortunes.length);
+            return fortunes[hash];
         }
 
         function runAI() {
@@ -262,66 +260,50 @@
                     setInterval(() => {
                         if (isAnalyzing) return;
                         
-                        // execute() භාවිතා කර තාක්ෂණික දෝෂ මගහරවා ඇත
                         model.execute(video).then(predictions => {
                             ctx.clearRect(0, 0, canvas.width, canvas.height);
                             
                             if (predictions.length > 0) {
                                 let palm = predictions[0];
                                 if(palm.confidence > 0.65) {
-                                    // Visual Neon Guide
+                                    // Boundary Box එක ඇඳීම
                                     ctx.strokeStyle = "#00f2ff";
-                                    ctx.lineWidth = 4;
-                                    ctx.setLineDash([15, 5]);
+                                    ctx.lineWidth = 5;
+                                    ctx.setLineDash([10, 5]);
                                     ctx.strokeRect(palm.bbox.x, palm.bbox.y, palm.bbox.width, palm.bbox.height);
                                     
-                                    triggerAnalysis();
+                                    // Analysis ආරම්භය
+                                    triggerAnalysis(palm.bbox);
                                 }
                             }
-                        }).catch(e => console.log("Engine sync..."));
-                    }, 450);
+                        });
+                    }, 400);
                 });
         }
 
-        function triggerAnalysis() {
+        function triggerAnalysis(bbox) {
             isAnalyzing = true;
             laser.style.display = "block";
-            status.innerHTML = "● ANALYZING: SCANNING DERMAL PATTERNS...";
+            status.innerHTML = "● ANALYZING: අල්ලේ රටා හඳුනාගනිමින්...";
             status.style.color = "#ffdd57";
             predictionBox.innerHTML = "කරුණාකර අල්ල නිසලව තබා ගන්න...";
 
-            // Digital Analysis Simulation Stages
-            const stages = [
-                "● PROCESSING: READING LIFE LINE...",
-                "● PROCESSING: IDENTIFYING WEALTH NODES...",
-                "● PROCESSING: CORRELATING POSITIVE DATASETS..."
-            ];
+            const selectedFortune = getStableFortune(bbox);
 
-            let i = 0;
-            const interval = setInterval(() => {
-                if(i < stages.length) {
-                    status.innerHTML = stages[i];
-                    i++;
-                } else {
-                    clearInterval(interval);
-                    showResult();
-                }
-            }, 1600);
-        }
+            setTimeout(() => { status.innerHTML = "● PROCESSING: රේඛා විශ්ලේෂණය කරයි..."; }, 1500);
+            setTimeout(() => { status.innerHTML = "● PROCESSING: දත්ත සංසන්දනය කරයි..."; }, 3000);
 
-        function showResult() {
-            const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
-            predictionBox.innerHTML = randomFortune;
-            status.innerHTML = "● ANALYSIS COMPLETE";
-            status.style.color = "#00f2ff";
-            laser.style.display = "none";
-            
-            // Cool down for next guest
-            setTimeout(() => { 
-                isAnalyzing = false; 
-                status.innerHTML = "● SYSTEM READY: SCAN FOR INSIGHTS";
-                predictionBox.innerHTML = "ඊළඟ පරීක්ෂාව සඳහා අල්ල පෙන්වන්න...";
-            }, 15000);
+            setTimeout(() => {
+                predictionBox.innerHTML = selectedFortune;
+                status.innerHTML = "● ANALYSIS COMPLETE: සාර්ථකයි";
+                status.style.color = "#00f2ff";
+                laser.style.display = "none";
+                
+                setTimeout(() => { 
+                    isAnalyzing = false; 
+                    status.innerHTML = "● SYSTEM READY: ඊළඟ පරීක්ෂාව සඳහා සූදානම්";
+                }, 10000);
+            }, 5000);
         }
     </script>
 </body>
