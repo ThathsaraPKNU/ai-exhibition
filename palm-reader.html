@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Palm Reader - Kime 2026</title>
+    <title>AI Palm Analyst | 2026</title>
     <style>
         :root {
             --neon-cyan: #00f2ff;
@@ -19,29 +19,45 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            align-items: center;
         }
 
         header {
             width: 100%;
-            padding: 20px;
-            background: #111;
-            border-bottom: 3px solid var(--neon-cyan);
+            padding: 30px 0;
+            background: linear-gradient(to bottom, #111, transparent);
             text-align: center;
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
         }
 
-        .main-topic { font-size: 28px; color: var(--neon-yellow); margin: 0; text-transform: uppercase; }
-        .sub-topic { font-size: 14px; color: var(--neon-cyan); margin-top: 5px; }
+        .main-topic {
+            font-size: 38px;
+            font-weight: 900;
+            color: var(--neon-yellow);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin: 0;
+            text-shadow: 0 0 20px rgba(255, 221, 87, 0.4);
+        }
 
+        /* Main Layout */
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 20px;
+            flex: 1;
+        }
+
+        /* Scanner Area */
         #container {
             position: relative;
-            margin: 20px;
-            border: 4px solid #222;
-            border-radius: 20px;
+            border: 5px solid #222;
+            border-radius: 25px;
             overflow: hidden;
             width: 640px;
             height: 480px;
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.1);
         }
 
         video, canvas {
@@ -61,59 +77,100 @@
             box-shadow: 0 0 15px var(--neon-cyan);
             z-index: 10;
             display: none;
-            animation: scan 2.5s infinite linear;
+            animation: scan 3s infinite linear;
         }
 
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
-        .results-box {
-            width: 90%;
-            max-width: 640px;
-            text-align: center;
-            padding: 20px;
+        /* Results & Side Disclaimer */
+        .side-panel {
+            width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         #prediction-text {
-            background: rgba(255, 221, 87, 0.1);
+            background: rgba(255, 221, 87, 0.05);
             border: 2px solid var(--neon-yellow);
-            padding: 20px;
-            border-radius: 15px;
-            font-size: 22px;
-            min-height: 60px;
-            margin-bottom: 20px;
+            padding: 25px;
+            border-radius: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--neon-yellow);
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .disclaimer {
-            font-size: 12px;
-            color: #888;
+        .scientific-box {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 5px solid var(--neon-cyan);
+            padding: 20px;
+            border-radius: 0 15px 15px 0;
+        }
+
+        .scientific-box h2 {
+            font-size: 22px;
+            color: var(--neon-cyan);
+            margin-top: 0;
+            text-transform: uppercase;
+        }
+
+        .scientific-box p {
+            font-size: 13px;
+            color: #ccc;
+            line-height: 1.7;
             text-align: justify;
-            line-height: 1.6;
-            border-top: 1px solid #333;
-            padding-top: 15px;
+            margin: 0;
+        }
+
+        footer {
+            padding: 20px;
+            font-size: 11px;
+            color: #444;
+            text-align: center;
+        }
+
+        #status {
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: var(--neon-cyan);
+            margin-bottom: 10px;
+            display: block;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1 class="main-topic">🔮 AI හස්ත රේඛා පරීක්ෂාව</h1>
-        <div class="sub-topic">2026 කිමේ බක්මහ උළෙල තාක්ෂණික ප්‍රදර්ශනය</div>
+        <h1 class="main-topic">2026 කිමේ බක්මහ උළෙල</h1>
     </header>
 
-    <div id="container">
-        <div id="laser-line"></div>
-        <video id="webcam" autoplay playsinline muted></video>
-        <canvas id="overlay"></canvas>
-    </div>
+    <div class="main-content">
+        <div id="container">
+            <div id="laser-line"></div>
+            <video id="webcam" autoplay playsinline muted></video>
+            <canvas id="overlay"></canvas>
+        </div>
 
-    <div class="results-box">
-        <div id="status" style="color: var(--neon-cyan); margin-bottom: 10px; font-weight: bold;">පද්ධතිය සක්‍රීයයි - අල්ල පෙන්වන්න</div>
-        <div id="prediction-text">ඔබේ අතේ රේඛා පරීක්ෂා කිරීමට සූදානම්...</div>
+        <div class="side-panel">
+            <div>
+                <span id="status">● SYSTEM READY</span>
+                <div id="prediction-text">ඔබේ අනාගතය දැනගැනීමට අල්ල පෙන්වන්න...</div>
+            </div>
 
-        <div class="disclaimer">
-            <strong>විද්‍යාත්මක සත්‍යය:</strong> අතේ රේඛා මඟින් අනාගතය 100% ක් නිවැරදිව ප්‍රකාශ කිරීමට මෙතෙක් ලොව කිසිදු තාක්ෂණයකට හැකියාවක් නැත. මෙහිදී අප සිදු කරනු ලබන්නේ පවතින උසස්ම <strong>Palm Detection Model</strong> එකක් භාවිතයෙන් අල්ලේ රේඛා රටා (Patterns) හඳුනාගෙන ඒවා දත්ත පද්ධතියක් සමඟ සංසන්දනය කර ධනාත්මක මගපෙන්වීමක් ලබා දීමයි. මෙවැනි AI පද්ධති තවමත් පර්යේෂණ මට්ටමේ පවතින අතර ඉදිරියේදී මීට වඩා නිවැරදි දත්ත ලබාගත හැකි වනු ඇත. මෙය හුදෙක් විනෝදාස්වාදය සඳහා පමණක් බව කරුණාවෙන් සලකන්න.
+            <div class="scientific-box">
+                <h2>විද්‍යාත්මක සත්‍යය:</h2>
+                <p>
+                    අතේ රේඛා මඟින් අනාගතය 100% ක් නිවැරදිව ප්‍රකාශ කිරීමට මෙතෙක් ලොව කිසිදු තාක්ෂණයකට හැකියාවක් නැත. මෙහිදී අප සිදු කරනු ලබන්නේ පවතින උසස්ම <strong>Palm Detection Model</strong> එකක් භාවිතයෙන් අල්ලේ රේඛා රටා (Patterns) හඳුනාගෙන ඒවා දත්ත පද්ධතියක් සමඟ සංසන්දනය කර ධනාත්මක මගපෙන්වීමක් ලබා දීමයි. මෙවැනි AI පද්ධති තවමත් පර්යේෂණ මට්ටමේ පවතින අතර මෙය හුදෙක් විනෝදාස්වාදය සඳහා පමණක් බව කරුණාවෙන් සලකන්න.
+                </p>
+            </div>
         </div>
     </div>
+
+    <footer>
+        VECTOR LAB AI | 2026 | EXHIBITION PROTOTYPE
+    </footer>
 
     <script src="https://cdn.roboflow.com/0.2.26/roboflow.js"></script>
     <script>
@@ -150,7 +207,6 @@
                     setInterval(() => {
                         if (isAnalyzing) return;
                         
-                        // මෙහිදී නැවත detect() භාවිතා කර ඇත
                         model.detect(video).then(predictions => {
                             ctx.clearRect(0, 0, canvas.width, canvas.height);
                             
@@ -174,7 +230,7 @@
         function startAnalysis(bbox) {
             isAnalyzing = true;
             laser.style.display = "block";
-            statusText.innerHTML = "ANALYZING: රේඛා පරීක්ෂා කරමින්...";
+            statusText.innerHTML = "● ANALYZING...";
             predictionText.innerHTML = "අල්ල නිසලව තබා ගන්න...";
 
             // එකම අතට එකම දේ ලැබීමට bbox අගයන් භාවිතයෙන් hash එකක් සෑදීම
@@ -182,14 +238,13 @@
 
             setTimeout(() => {
                 predictionText.innerHTML = fortunes[hashIndex];
-                statusText.innerHTML = "පරීක්ෂාව අවසන්!";
+                statusText.innerHTML = "● COMPLETE";
                 laser.style.display = "none";
                 
-                // තත්පර 10 කට පසු නැවත සක්‍රිය වේ
                 setTimeout(() => { 
                     isAnalyzing = false; 
-                    statusText.innerHTML = "පද්ධතිය සූදානම් - අල්ල පෙන්වන්න";
-                }, 10000);
+                    statusText.innerHTML = "● SYSTEM READY";
+                }, 10000); // තත්පර 10 කට පසු නැවත සක්‍රිය වේ
             }, 4000);
         }
     </script>
