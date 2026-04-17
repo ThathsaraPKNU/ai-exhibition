@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Elephant Game | Bakmaha 2026</title>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils"></script>
+    
+    <style>
+        :root { --gold: #ffdd57; --neon-blue: #00f2ff; }
+        body { margin: 0; background: #0a0a0a; color: #fff; font-family: 'Segoe UI', sans-serif; text-align: center; overflow: hidden; }
+        
+        .header { background: var(--gold); color: #000; padding: 10px; font-weight: 900; font-size: 20px; box-shadow: 0 4px 15px rgba(255, 221, 87, 0.3); }
+
+        /* Game Area */
+        #game-canvas-container {
+            position: relative;
+            width: 800px;
+            height: 500px;
+            margin: 20px auto;
+            background: url('https://img.freepik.com/free-vector/cartoon-elephant-white-background_1308-133035.jpg') no-repeat center;
+            background-size: contain;
+            border: 5px solid #333;
+            border-radius: 15px;
+            background-color: white;
+        }
+
+        /* Target Point (අලියාගේ ඇස තැබිය යුතු තැන) */
+        #target {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 0, 0, 0.3);
+            border-radius: 50%;
+            top: 165px; /* අලියාගේ ඇස ඇති තැනට අනුව සකසන්න */
+            left: 215px;
+            border: 2px dashed red;
+        }
+
+        /* Moving Eye (ඇඟිල්ල සමඟ යන ඇස) */
+        #eye-cursor {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: url('https://cdn-icons-png.flaticon.com/512/595/595053.png') no-repeat center;
+            background-size: contain;
+            pointer-events: none;
+            z-index: 100;
+            transition: transform 0.1s ease-out;
+        }
+
+        /* Hidden Webcam for Tracking */
+        #webcam { display: none; }
+        
+        .footer { position: absolute; bottom: 15px; width: 100%; font-size: 14px; color: #666; }
+        #message { font-size: 24px; color: var(--gold); font-weight: bold; margin-top: 10px; min-height: 40px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">🌸 කීමේ බක්මහ උළෙල - 2026 | AI අලියාට ඇස තැබීම 🐘</div>
+    
+    <div id="message">දබර ඇඟිල්ල ඔසවා "ඇස" නියම තැනට ගෙන යන්න!</div>
+
+    <div id="game-canvas-container">
+        <div id="target"></div>
+        <div id="eye-cursor"></div>
+        <video id="webcam"></video>
+    </div>
+
+    <div class="footer">PRESENTED BY VECTOR LABS AI & E9 SHOP</div>
+
+    <script type="module">
+        const videoElement = document.getElementById('webcam');
+        const eyeCursor = document.getElementById('eye-cursor');
+        const target = document.getElementById('target');
+        const message = document.getElementById('message');
+        const container = document.getElementById('game-canvas-container');
+
+        let successCounter = 0;
+
+        function onResults(results) {
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                // දබර ඇඟිල්ලේ කෙළවර (Index Finger Tip - Point 8)
+                const indexTip = results.multiHandLandmarks[0][8];
+
+                // Screen coordinates වලට හැරවීම (කැමරාව Mirror කර ඇති නිසා 1-x ලෙස ගනී)
+                const x = (1 - indexTip.x) * container.offsetWidth;
+                const y = indexTip.y * container.offsetHeight;
+
+                // Cursor එක චලනය කිරීම
+                eyeCursor.style.left = `${x - 20}px`;
+                eyeCursor.style.top = `${y - 20}px`;
+
+                checkCollision(x, y);
+            }
+        }
+
+        function checkCollision(x, y) {
+            const targetRect = target.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+
+            // සාපේක්ෂ පිහිටීම බැලීම
+            const tx = target.offsetLeft + 10;
+            const ty = target.offsetTop + 10;
+
+            const distance = Math.sqrt(Math.pow(x - tx, 2) + Math.pow(y - ty, 2));
+
+            if (distance < 30) {
+                successCounter++;
+                target.style.background = "rgba(0, 255, 0, 0.5)";
+                if (successCounter > 50) { // තත්පර 1.5ක් පමණ ස්ථාවරව තබාගත යුතුය
+                    message.innerText = "🎉 ජයග්‍රහණය කළා! නිවැරදිව ඇස තැබුවා! 🏆";
+                    message.style.color = "#39ff14";
+                }
+            } else {
+                successCounter = 0;
+                target.style.background = "rgba(255, 0, 0, 0.3)";
+                if (message.innerText.includes("ජයග්‍රහණය")) return;
+                message.innerText = "දබර ඇඟිල්ලෙන් ඇස නියම තැනට ගෙන යන්න...";
+                message.style.color = "#ffdd57";
+            }
+        }
+
+        const hands = new Hands({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+        });
+
+        hands.setOptions({
+            maxNumHands: 1,
+            modelComplexity: 1,
+            minDetectionConfidence: 0.7,
+            minTrackingConfidence: 0.7
+        });
+
+        hands.onResults(onResults);
+
+        const camera = new Camera(videoElement, {
+            onFrame: async () => {
+                await hands.send({image: videoElement});
+            },
+            width: 640,
+            height: 480
+        });
+        camera.start();
+    </script>
+</body>
+</html>
