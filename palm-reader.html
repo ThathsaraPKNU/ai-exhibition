@@ -9,91 +9,62 @@
             --neon-cyan: #00f2ff;
             --neon-yellow: #ffdd57;
             --dark-bg: #0a0a0a;
-            --panel-bg: rgba(20, 20, 20, 0.95);
+            --panel-bg: rgba(20, 20, 20, 0.98);
         }
 
         body {
             margin: 0;
             background: var(--dark-bg);
             color: #fff;
-            font-family: 'Segoe UI', sans-serif;
-            overflow-x: hidden;
+            font-family: 'Segoe UI', 'Identity-Sinhala', sans-serif;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
-        }
-
-        /* Startup Loader */
-        #loader {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
+            min-height: 100vh;
+            padding: 10px;
         }
 
-        .loader-ring {
-            width: 80px;
-            height: 80px;
-            border: 3px solid rgba(0, 242, 255, 0.1);
-            border-top: 3px solid var(--neon-cyan);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            box-shadow: 0 0 15px var(--neon-cyan);
-        }
-
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        /* Main App Interface */
-        #app {
-            display: none;
-            opacity: 0;
-            transition: opacity 1s ease-in;
-            flex: 1;
-            flex-direction: column;
-        }
-
+        /* Header Section */
         header {
-            padding: 25px;
-            background: linear-gradient(to bottom, #111, transparent);
-            border-bottom: 2px solid rgba(0, 242, 255, 0.3);
             text-align: center;
+            padding: 15px 0;
+            width: 100%;
         }
 
-        .title {
-            font-size: 26px;
-            font-weight: 800;
+        .main-title {
+            font-size: 24px;
+            font-weight: 900;
             color: var(--neon-yellow);
             text-transform: uppercase;
-            letter-spacing: 3px;
-            text-shadow: 0 0 15px rgba(255, 221, 87, 0.5);
             margin: 0;
+            text-shadow: 0 0 10px rgba(255, 221, 87, 0.4);
         }
 
+        /* Mobile Responsive Container */
+        .main-layout {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 500px; /* Mobile Friendly Width */
+            gap: 15px;
+        }
+
+        /* Camera Viewport - Smaller for Mobile */
         #viewport-container {
             position: relative;
-            margin: 20px auto;
-            width: fit-content;
-            border-radius: 25px;
-            border: 4px solid #222;
+            width: 280px; /* කුඩා කැමරා දර්ශනය */
+            height: 210px;
+            margin: 0 auto;
+            border-radius: 20px;
+            border: 3px solid #333;
             overflow: hidden;
-            box-shadow: 0 0 40px rgba(0, 242, 255, 0.1);
+            background: #000;
         }
 
-        video {
-            display: block;
-            width: 100%;
-            max-width: 640px;
-            transform: scaleX(-1);
-            filter: brightness(1.1) contrast(1.1);
-        }
-
-        canvas {
+        video, canvas {
             position: absolute;
-            inset: 0;
+            width: 100%;
+            height: 100%;
             transform: scaleX(-1);
         }
 
@@ -102,11 +73,11 @@
             width: 100%;
             height: 3px;
             background: var(--neon-cyan);
-            box-shadow: 0 0 20px var(--neon-cyan);
+            box-shadow: 0 0 15px var(--neon-cyan);
             top: 0;
             display: none;
             z-index: 10;
-            animation: scanMove 3s infinite linear;
+            animation: scanMove 2.5s infinite linear;
         }
 
         @keyframes scanMove { 
@@ -115,53 +86,60 @@
             100% { top: 100%; opacity: 0; }
         }
 
-        .info-panel {
-            padding: 0 20px 20px;
-            max-width: 700px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        #status-indicator {
-            font-size: 13px;
+        /* Results & Status Section */
+        .status-box {
+            font-size: 12px;
             color: var(--neon-cyan);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 12px;
+            text-align: center;
+            letter-spacing: 1px;
             font-weight: bold;
+            margin-top: 5px;
         }
 
         #prediction-text {
             background: var(--panel-bg);
-            border: 1px solid rgba(255, 221, 87, 0.3);
-            border-radius: 18px;
-            padding: 25px;
-            font-size: 22px;
+            border: 2px solid var(--neon-yellow);
+            border-radius: 15px;
+            padding: 20px;
+            font-size: 20px;
             color: var(--neon-yellow);
-            font-weight: 600;
-            min-height: 80px;
+            text-align: center;
+            min-height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            line-height: 1.5;
+            font-weight: 600;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
         }
 
-        .disclaimer-box {
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 15px;
-            font-size: 11.5px;
-            color: #999;
+        /* Scientific Disclaimer - More Prominent */
+        .disclaimer-card {
+            background: rgba(0, 242, 255, 0.05);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            border-left: 5px solid var(--neon-cyan);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .disclaimer-card h2 {
+            font-size: 18px;
+            color: var(--neon-cyan);
+            margin: 0 0 10px 0;
+        }
+
+        .disclaimer-card p {
+            font-size: 13.5px;
+            line-height: 1.6;
+            margin: 0;
+            color: #ddd;
             text-align: justify;
-            line-height: 1.7;
-            border: 1px solid #222;
         }
 
         footer {
-            padding: 15px;
-            font-size: 11px;
+            margin-top: auto;
+            padding: 20px;
+            font-size: 10px;
             color: #444;
             text-align: center;
         }
@@ -169,42 +147,41 @@
 </head>
 <body>
 
-    <div id="loader">
-        <div class="loader-ring"></div>
-        <p style="color: var(--neon-cyan); margin-top: 20px; font-family: monospace; letter-spacing: 2px;">SECURE BIO-LINK ESTABLISHED...</p>
-    </div>
+    <header>
+        <h1 class="main-title">AI අල්ල පරීක්ෂාව</h1>
+        <div style="font-size: 11px; color: #666;">2026 කිමේ බක්මහ උළෙල තාක්ෂණික ප්‍රදර්ශනය</div>
+    </header>
 
-    <div id="app">
-        <header>
-            <h1 class="title">🔮 AI Palm Fortune Analyst</h1>
-            <div style="font-size: 12px; color: #555; margin-top: 5px;">KIME BAKMAHA ULELE 2026 | TECH EXHIBITION</div>
-        </header>
-
+    <div class="main-layout">
+        
         <div id="viewport-container">
             <div id="laser-line"></div>
             <video id="webcam" autoplay playsinline muted></video>
             <canvas id="overlay"></canvas>
         </div>
 
-        <div class="info-panel">
-            <div id="status-indicator">● SYSTEM READY: SCAN FOR INSIGHTS</div>
-            <div id="prediction-text">කරුණාකර ඔබේ අල්ල කැමරාවට පෙන්වන්න...</div>
-
-            <div class="disclaimer-box">
-                <strong>⚠️ තාක්ෂණික හා විද්‍යාත්මක නිවේදනය:</strong><br>
-                විද්‍යාත්මකව බැලූ කල, මිනිස් අතේ රේඛා මඟින් අනාගතය 100% ක් නිවැරදිව ප්‍රකාශ කිරීමට කිසිදු තාක්ෂණයකට මෙතෙක් හැකියාවක් නැත. මෙහිදී අප භාවිතා කරන්නේ පවතින උසස්ම <strong>Palm Detection</strong> මාදිලියක් වන අතර, මෙම ප්‍රතිඵල හුදෙක් ඔබගේ විනෝදාස්වාදය සඳහා පමණක් බව කරුණාවෙන් සලකන්න.
-            </div>
+        <div class="result-area">
+            <div id="status-label" class="status-box">● පද්ධතිය සූදානම්</div>
+            <div id="prediction-text">අනාගතය දැනගැනීමට ඔබේ අල්ල පෙන්වන්න...</div>
         </div>
 
-        <footer>VECTOR LAB AI | 2026 | PROFESSIONAL PROTOTYPE</footer>
+        <div class="disclaimer-card">
+            <h2>විද්‍යාත්මක නිවේදනය:</h2>
+            <p>
+                මිනිස් අතේ රේඛා මඟින් අනාගතය 100% ක් නිවැරදිව පැවසීමට ලොව කිසිදු තාක්ෂණයකට මෙතෙක් හැකියාවක් නැත. මෙම AI පද්ධතිය මඟින් සිදු කරනු ලබන්නේ ඔබේ අල්ලේ රේඛා රටා (Patterns) විශ්ලේෂණය කර ධනාත්මක මගපෙන්වීමක් ලබා දීමයි. මෙය හුදෙක් ඔබගේ විනෝදාස්වාදය සඳහා පමණක් බව සලකන්න.
+            </p>
+        </div>
+
     </div>
+
+    <footer>VECTOR LAB AI | 2026 PROTOTYPE</footer>
 
     <script src="https://cdn.roboflow.com/0.2.26/roboflow.js"></script>
     <script>
         const video = document.getElementById("webcam");
         const canvas = document.getElementById("overlay");
         const ctx = canvas.getContext("2d");
-        const status = document.getElementById("status-indicator");
+        const statusLabel = document.getElementById("status-label");
         const predictionBox = document.getElementById("prediction-text");
         const laser = document.getElementById("laser-line");
 
@@ -213,98 +190,76 @@
         const VERSION = 2;
 
         const fortunes = [
-            "ඔබ ඉතාමත් වාසනාවන්තයෙක්. ඉදිරි මාස කිහිපය තුළ ඔබ නොසිතූ මූල්‍යමය වාසනාවක් හිමිවේවි! 💰",
-            "ඔබ ඉතාමත් කාරුණික හදවතක් ඇති අයෙක්. ඔබ අන් අයට කරන උදව් උපකාර නිසාම මේ වසරේ ඔබට විශාල ජයග්‍රහණයක් හිමිවනු ඇත! 🌸",
-            "ඔබේ ආයුෂ රේඛාව ඉතා පැහැදිලියි. ඔබ ඉතා නිරෝගී සහ දීර්ඝ ජීවිතයක් භුක්ති විඳින වාසනාවන්තයෙකි! 💪",
-            "ඔබ ඉතා නිර්මාණශීලී කෙනෙක්. කොරියාවේදී ඔබේ වෘත්තීය දක්ෂතාවලට ඉහළම පිළිගැනීමක් ඉක්මනින්ම ලැබෙනු ඇත! 🚀",
-            "ඔබට ඉතාමත් වාසනාවන්ත සංචාරක රේඛා පිහිටා තිබේ. නුදුරේදීම විදේශ සංචාරයකට ඔබට අවස්ථාව ලැබේවි! ✈️",
-            "ඔබ ඉතාමත් දූරදර්ශී කෙනෙක්. ඔබ ගන්නා තීරණ නිසා ඔබේ පවුලේ සැමට ඉදිරියේදී විශාල ආඩම්බරයක් හිමිවීමට නියමිතයි! ✨"
+            "ඔබ ඉතාමත් වාසනාවන්තයෙක්. ඉදිරි කාලයේදී ඔබට නොසිතූ සුබ පණිවිඩයක් ලැබේවි! 💰",
+            "ඔබේ කාරුණික ගතිගුණ නිසා නුදුරේදීම සමාජයෙන් ඉහළ පිළිගැනීමක් හිමිවේවි! 🌸",
+            "ඉතා පැහැදිලි ආයුෂ රේඛාවක් පෙනෙන්නට තිබේ. ඔබ දීර්ඝ ජීවිතයක් භුක්ති විඳිනු ඇත! 💪",
+            "ඔබේ වෘත්තීය දක්ෂතාවලට ඉහළම තැනක් ලැබෙන කාලය උදා වී ඇත! 🚀",
+            "නුදුරේදීම වාසනාවන්ත විදේශ සංචාරයකට මඟ විවර වනු ඇත! ✈️",
+            "ඔබේ තීරණ නිසා ඔබේ පවුලට ඉදිරියේදී විශාල ආඩම්බරයක් හිමිවේවි! ✨"
         ];
 
         let isAnalyzing = false;
 
-        window.onload = () => {
-            setTimeout(() => {
-                document.getElementById("loader").style.display = "none";
-                const app = document.getElementById("app");
-                app.style.display = "flex";
-                setTimeout(() => app.style.opacity = "1", 50);
-                startCamera();
-            }, 3000);
-        };
+        // Camera Start
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+            .then(stream => {
+                video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    loadModel();
+                };
+            });
 
-        function startCamera() {
-            navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720, facingMode: "user" } })
-                .then(stream => {
-                    video.srcObject = stream;
-                    video.onloadedmetadata = () => {
-                        canvas.width = video.videoWidth;
-                        canvas.height = video.videoHeight;
-                        runAI();
-                    };
-                });
-        }
-
-        function runAI() {
+        function loadModel() {
             roboflow.auth({ publishable_key: API_KEY }).load({ model: MODEL_ID, version: VERSION })
                 .then(model => {
                     setInterval(() => {
                         if (isAnalyzing) return;
                         
-                        // මෙහිදී model.detect භාවිතා කිරීමෙන් console error එක විසඳේ
                         model.detect(video).then(predictions => {
                             ctx.clearRect(0, 0, canvas.width, canvas.height);
                             if (predictions.length > 0) {
                                 let palm = predictions[0];
-                                if(palm.confidence > 0.65) {
+                                if(palm.confidence > 0.7) {
+                                    // Draw Border
                                     ctx.strokeStyle = "#00f2ff";
-                                    ctx.lineWidth = 4;
+                                    ctx.lineWidth = 6;
                                     ctx.strokeRect(palm.bbox.x, palm.bbox.y, palm.bbox.width, palm.bbox.height);
-                                    triggerAnalysis();
+                                    
+                                    startScan();
                                 }
                             }
-                        }).catch(e => { console.log("System syncing..."); });
-                    }, 500);
+                        }).catch(e => console.log("Syncing..."));
+                    }, 600);
                 });
         }
 
-        function triggerAnalysis() {
+        function startScan() {
             isAnalyzing = true;
             laser.style.display = "block";
-            status.innerHTML = "● ANALYZING: SCANNING DERMAL PATTERNS...";
-            status.style.color = "#ffdd57";
+            statusLabel.innerHTML = "● දත්ත විශ්ලේෂණය වෙමින් පවතී...";
+            statusLabel.style.color = "#ffdd57";
             predictionBox.innerHTML = "කරුණාකර අල්ල නිසලව තබා ගන්න...";
 
-            const stages = [
-                "● PROCESSING: READING LIFE LINE...",
-                "● PROCESSING: IDENTIFYING WEALTH NODES...",
-                "● PROCESSING: CORRELATING POSITIVE DATASETS..."
-            ];
+            // Digital effect delays
+            setTimeout(() => { statusLabel.innerHTML = "● රේඛා සටහන් පරීක්ෂා කරමින්..."; }, 1500);
+            setTimeout(() => { statusLabel.innerHTML = "● අවසන් දත්ත සකසමින්..."; }, 3000);
 
-            let i = 0;
-            const interval = setInterval(() => {
-                if(i < stages.length) {
-                    status.innerHTML = stages[i];
-                    i++;
-                } else {
-                    clearInterval(interval);
-                    showResult();
-                }
-            }, 1600);
-        }
-
-        function showResult() {
-            const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
-            predictionBox.innerHTML = randomFortune;
-            status.innerHTML = "● ANALYSIS COMPLETE";
-            status.style.color = "#00f2ff";
-            laser.style.display = "none";
-            
-            setTimeout(() => { 
-                isAnalyzing = false; 
-                status.innerHTML = "● SYSTEM READY: SCAN FOR INSIGHTS";
-                predictionBox.innerHTML = "ඊළඟ පරීක්ෂාව සඳහා අල්ල පෙන්වන්න...";
-            }, 15000);
+            setTimeout(() => {
+                const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
+                predictionBox.innerHTML = randomFortune;
+                statusLabel.innerHTML = "● පරීක්ෂාව අවසන්";
+                statusLabel.style.color = "#00f2ff";
+                laser.style.display = "none";
+                
+                // Wait before next scan
+                setTimeout(() => { 
+                    isAnalyzing = false; 
+                    statusLabel.innerHTML = "● පද්ධතිය සූදානම්";
+                    predictionBox.innerHTML = "ඊළඟ පරීක්ෂාව සඳහා අල්ල පෙන්වන්න...";
+                }, 12000);
+            }, 5000);
         }
     </script>
 </body>
