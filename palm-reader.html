@@ -2,144 +2,98 @@
 <html lang="si">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Palm Analyst | 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>කිමේ බක්මහ උළෙල AI | Palm Analyst</title>
+    <script src="https://cdn.roboflow.com/0.2.26/roboflow.js"></script>
     <style>
         :root {
             --neon-cyan: #00f2ff;
             --neon-yellow: #ffdd57;
-            --dark-bg: #0a0a0a;
+            --dark-bg: #050505;
         }
 
         body {
-            margin: 0;
-            background: var(--dark-bg);
-            color: #fff;
-            font-family: 'Segoe UI', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px;
+            margin: 0; background: var(--dark-bg); color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh; overflow-x: hidden;
         }
 
-        /* Highlighted Header */
-        .bakmaha-tag {
-            background: var(--neon-yellow);
-            color: #000;
-            padding: 3px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 14px;
-            margin-bottom: 5px;
-            display: inline-block;
+        /* 1. ආරම්භක තිරය (Splash Screen) */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--dark-bg); z-index: 1000; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 20px;
         }
-
-        header { text-align: center; margin-bottom: 10px; }
-
-        .main-title {
-            font-size: 20px;
-            color: #fff;
-            margin: 0;
-            letter-spacing: 1px;
+        .splash-title { font-size: 2.2rem; color: var(--neon-yellow); font-weight: 900; margin-bottom: 5px; }
+        .splash-sub { font-size: 1.4rem; color: var(--neon-cyan); font-weight: bold; margin-bottom: 35px; }
+        .start-btn { 
+            padding: 18px 45px; background: var(--neon-cyan); color: #000; 
+            border: none; border-radius: 40px; font-weight: bold; font-size: 1.2rem; 
+            cursor: pointer; box-shadow: 0 0 20px var(--neon-cyan);
+            transition: transform 0.2s;
         }
+        .start-btn:active { transform: scale(0.95); }
 
-        /* Mobile Viewport */
+        /* Mobile Camera Viewport */
         #viewport-container {
             position: relative;
-            width: 250px;
-            height: 190px;
-            border-radius: 15px;
-            border: 2px solid #333;
-            overflow: hidden;
-            background: #000;
+            width: 320px; height: 240px;
+            border-radius: 20px; border: 3px solid #333;
+            overflow: hidden; background: #000; margin-top: 15px;
+            box-shadow: 0 0 25px rgba(0, 242, 255, 0.2);
         }
 
         video, canvas {
-            position: absolute;
-            width: 100%;
-            height: 100%;
+            position: absolute; width: 100%; height: 100%;
             transform: scaleX(-1);
         }
 
         #laser-line {
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            background: var(--neon-cyan);
-            box-shadow: 0 0 10px var(--neon-cyan);
-            top: 0;
-            display: none;
-            z-index: 10;
+            position: absolute; width: 100%; height: 4px;
+            background: var(--neon-cyan); box-shadow: 0 0 15px var(--neon-cyan);
+            top: 0; display: none; z-index: 10;
             animation: scanMove 2s infinite linear;
         }
-
         @keyframes scanMove { 0% { top: 0%; } 100% { top: 100%; } }
 
-        /* Prediction Result */
-        .result-container {
-            width: 100%;
-            max-width: 380px;
-            margin-top: 10px;
-        }
-
-        #status-label {
-            font-size: 11px;
-            color: var(--neon-cyan);
-            text-align: center;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
+        /* Prediction Result Section */
+        .result-container { width: 90%; max-width: 400px; margin-top: 15px; }
+        #status-label { font-size: 13px; color: var(--neon-cyan); text-align: center; margin-bottom: 10px; font-weight: bold; letter-spacing: 1px; }
         #prediction-text {
-            background: rgba(255, 221, 87, 0.05);
-            border: 1.5px solid var(--neon-yellow);
-            border-radius: 12px;
-            padding: 15px;
-            font-size: 18px;
-            color: var(--neon-yellow);
-            text-align: center;
-            min-height: 40px;
-            font-weight: 600;
+            background: rgba(255, 221, 87, 0.05); border: 1.5px solid var(--neon-yellow);
+            border-radius: 15px; padding: 20px; font-size: 19px;
+            color: var(--neon-yellow); text-align: center; min-height: 80px; 
+            font-weight: 600; display: flex; align-items: center; justify-content: center;
+            line-height: 1.5; box-shadow: inset 0 0 10px rgba(255, 221, 87, 0.1);
         }
 
-        /* Scientific Disclaimer Section - Full Text */
-        .scientific-section {
-            background: rgba(255, 255, 255, 0.03);
-            border-left: 3px solid var(--neon-cyan);
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            font-size: 12.5px;
-            line-height: 1.6;
+        /* 2. Highlighted Branding (අලියාට ඇස තැබීම හා සමානයි) */
+        .branding-section {
+            width: 100%; text-align: center; padding: 30px 10px; margin-top: auto;
+            background: linear-gradient(to bottom, transparent, rgba(255, 221, 87, 0.05));
         }
-
-        .scientific-section h4 {
-            color: var(--neon-cyan);
-            margin: 0 0 8px 0;
-            font-size: 15px;
+        .main-topic-highlight {
+            font-size: 2.3rem; color: var(--neon-yellow); font-weight: 900;
+            text-shadow: 0 0 15px rgba(255, 221, 87, 0.6); margin-bottom: 8px;
         }
-
-        .scientific-section p {
-            color: #ccc;
-            margin: 0 0 10px 0;
-            text-align: justify;
+        .powered-by {
+            font-size: 1rem; color: #aaa; letter-spacing: 2px; font-weight: 500;
         }
+        .powered-by b { color: #fff; font-weight: 900; }
 
-        .note {
-            font-style: italic;
-            color: #888;
-            font-size: 11px;
-        }
-
-        footer { margin-top: 20px; font-size: 9px; color: #444; }
+        .disclaimer { font-style: italic; color: #555; font-size: 11px; margin-top: 15px; padding: 0 20px; line-height: 1.4; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="bakmaha-tag">2026 කිමේ බක්මහ උළෙල</div>
-        <h1 class="main-title">AI හස්ත රේඛා විද්‍යාගාරය</h1>
-    </header>
+    <div id="splash-screen">
+        <div class="splash-title">කිමේ බක්මහ උළෙල - 2026</div>
+        <div class="splash-sub">AI හස්ත රේඛා විද්‍යාගාරය</div>
+        <button class="start-btn" onclick="startApp()">විශ්ලේෂණය අරඹන්න 🚀</button>
+        <div style="margin-top: 25px; font-size: 0.8rem; color: #444; letter-spacing: 1px;">VECTOR LABS AI & E9 SHOP</div>
+    </div>
 
     <div id="viewport-container">
         <div id="laser-line"></div>
@@ -150,23 +104,14 @@
     <div class="result-container">
         <div id="status-label">● පද්ධතිය සූදානම්</div>
         <div id="prediction-text">පරීක්ෂා කිරීමට ඔබේ අල්ල පෙන්වන්න...</div>
-
-        <div class="scientific-section">
-            <h4>විද්‍යාත්මක සත්‍යය:</h4>
-            <p>
-                විද්‍යාත්මක දෘෂ්ටිකෝණයකින් බැලූ කල, මිනිස් අතේ රේඛා හෝ ශරීර ලක්ෂණ මඟින් අනාගතයේ සිදුවන නිශ්චිත සිදුවීම් 100%ක් නිවැරදිව ප්‍රකාශ කිරීමට මෙතෙක් කිසිදු තාක්ෂණයකට හෝ ශාස්ත්‍රයකට හැකියාවක් නැත.
-            </p>
-            <h4>AI ක්‍රියාකාරිත්වය සහ අනාගතය:</h4>
-            <p>
-                මෙහිදී අප විසින් සිදු කරනු ලබන්නේ AI Palm Detection Model එකක් භාවිත කර ඔබගේ අල්ලේ රේඛා රටා (Patterns) හඳුනාගෙන, ඒවා පොදු දත්ත පද්ධති සමඟ සංසන්දනය කිරීම පමණි. මෙවැනි AI මාදිලීන් ලොව පුරා තවමත් පර්යේෂණ සහ පුහුණු කිරීම් (Training) මට්ටමේ පවතින අතර, ඉදිරි කාලයේදී කෘතිම බුද්ධිය හරහා වඩාත් නිවැරදි සහ ගැඹුරු විශ්ලේෂණ ලබා ගැනීමට හැකි වනු ඇතැයි අපි විශ්වාස කරමු.
-            </p>
-            <div class="note">සටහන: මෙය විනෝදය සඳහා පමණක් ඉදිරිපත් කරන්නකි. මෙවැනි ව්‍යාපෘති තවමත් පර්යේෂණ මට්ටමේ පවතින බව කරුණාවෙන් සලකන්න.</div>
-        </div>
     </div>
 
-    <footer>VECTOR LAB AI | 2026</footer>
+    <div class="branding-section">
+        <div class="main-topic-highlight">කිමේ බක්මහ උළෙල - 2026</div>
+        <div class="powered-by">POWERED BY <b>VECTOR LABS AI & E9 SHOP</b></div>
+        <div class="disclaimer">සටහන: මෙය විනෝදය සඳහා පමණක් ඉදිරිපත් කරන ලද්දකි. කෘතිම බුද්ධිය හරහා අල්ලේ රටා හඳුනාගැනීම තවමත් පර්යේෂණ මට්ටමේ පවතී.</div>
+    </div>
 
-    <script src="https://cdn.roboflow.com/0.2.26/roboflow.js"></script>
     <script>
         const video = document.getElementById("webcam");
         const canvas = document.getElementById("overlay");
@@ -175,43 +120,73 @@
         const predictionBox = document.getElementById("prediction-text");
         const laser = document.getElementById("laser-line");
 
-        const API_KEY = "rf_4tlgDCsTcah7rsFZTkKONHC3TXO2"; 
-        const MODEL_ID = "palm-detection-qvrsc"; 
-        const VERSION = 2;
-
+        // 20 Unique Fortunes
         const fortunes = [
             "ඔබ ඉතාමත් වාසනාවන්තයෙක්. ඉදිරි කාලයේදී ඔබට නොසිතූ සුබ පණිවිඩයක් ලැබේවි! 💰",
             "ඔබේ කාරුණික ගතිගුණ නිසා නුදුරේදීම සමාජයෙන් ඉහළ පිළිගැනීමක් හිමිවේවි! 🌸",
             "ඉතා පැහැදිලි ආයුෂ රේඛාවක් පෙනෙන්නට තිබේ. ඔබ දීර්ඝ ජීවිතයක් භුක්ති විඳිනු ඇත! 💪",
             "ඔබේ වෘත්තීය දක්ෂතාවලට ඉහළම තැනක් ලැබෙන කාලය උදා වී ඇත! 🚀",
             "නුදුරේදීම වාසනාවන්ත විදේශ සංචාරයකට ඔබට මඟ විවර වනු ඇත! ✈️",
-            "ඔබේ තීරණ නිසා ඔබේ පවුලට ඉදිරියේදී විශාල ආඩම්බරයක් හිමිවේවි! ✨"
+            "ඔබේ තීරණ නිසා ඔබේ පවුලට ඉදිරියේදී විශාල ආඩම්බරයක් හිමිවේවි! ✨",
+            "ඔබේ හිතේ තිබෙන ලොකුම බලාපොරොත්තුවක් මේ වසරේදී ඉටු වීමට නියමිතයි! 🌟",
+            "ඔබේ ධෛර්යවන්තකම නිසා අසීරු බාධක ජයගෙන විශාල දියුණුවක් ලබනවා නිසැකයි! 🔥",
+            "නුදුරේදීම ඔබට ඉතා වටිනා තෑග්ගක් හෝ දේපළක් ලැබීමට වාසනාව තිබේ! 🎁",
+            "කලක් තිස්සේ තිබූ ප්‍රශ්නයක් නුදුරේදීම විසඳී සිතට ලොකු සහනයක් දැනේවි! 🧘",
+            "ඔබේ නායකත්ව ගුණාංග නිසා රැකියා ස්ථානයේදී ඔබට උසස් වීමක් ලැබිය හැකියි! 🎖️",
+            "ඔබේ නිර්මාණශීලී අදහස්වලට අගයක් ලැබෙන නව මාවතක් නුදුරේදීම විවෘත වේවි! 🎨",
+            "අලුත් මිතුරන් පිරිසක් හඳුනාගැනීමට ලැබීමෙන් ඔබේ ජීවිතයට අලුත් ආලෝකයක් ලැබේවි! 🤝",
+            "ඔබේ අධ්‍යාපන හෝ වෘත්තීය කටයුතුවලින් නොසිතූ ඉහළ ජයග්‍රහණයක් අත්වේවි! 🎓",
+            "ඔබේ ඉවසීම සහ කැපවීම නිසා ඉදිරි මාස කිහිපය ඔබට ඉතාමත් ඵලදායී වේවි! ⏳",
+            "සිතේ තිබූ බියක් පහව ගොස් නව ආත්ම විශ්වාසයකින් ඉදිරියට යාමට අවස්ථාව ලැබේවි! 🌈",
+            "ඔබේ ආර්ථික තත්ත්වය ඉතා ඉක්මනින් යහපත් අතට හැරෙන ලකුණු පෙනේ! 📈",
+            "ඔබ ආදරය කරන අයගෙන් ඔබට වැඩි සැලකිල්ලක් සහ ආදරයක් හිමිවන කාලයකි! ❤️",
+            "ගොඩක් කලකට පස්සේ පරණ හිතවතෙකුගෙන් ඔබට සුබ ආරංචියක් ලැබේවි! 📞",
+            "ඔබේ අත්ලට අනුව ඔබ ඕනෑම අභියෝගයකට මුහුණ දිය හැකි ශක්තිමත් අයෙකි! 🏆"
         ];
 
         let isAnalyzing = false;
 
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-            .then(stream => {
-                video.srcObject = stream;
-                video.onloadedmetadata = () => {
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    loadModel();
-                };
-            });
+        function startApp() {
+            document.getElementById('splash-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('splash-screen').style.display = 'none';
+                initCamera();
+            }, 500);
+        }
+
+        function initCamera() {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.onloadedmetadata = () => {
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        loadModel();
+                    };
+                })
+                .catch(err => {
+                    predictionBox.innerHTML = "කැමරාව ක්‍රියාත්මක කිරීමට අවසර ලබා දෙන්න.";
+                });
+        }
 
         function loadModel() {
-            roboflow.auth({ publishable_key: API_KEY }).load({ model: MODEL_ID, version: VERSION })
+            roboflow.auth({ publishable_key: "rf_4tlgDCsTcah7rsFZTkKONHC3TXO2" })
+                .load({ model: "palm-detection-qvrsc", version: 2 })
                 .then(model => {
+                    statusLabel.innerHTML = "● පද්ධතිය සූදානම්";
                     setInterval(() => {
                         if (isAnalyzing) return;
                         model.detect(video).then(predictions => {
                             ctx.clearRect(0, 0, canvas.width, canvas.height);
                             if (predictions.length > 0) {
-                                let palm = predictions[0];
-                                if(palm.confidence > 0.75) {
-                                    const seed = Math.round(palm.bbox.width + palm.bbox.x);
-                                    startScan(seed);
+                                let palm = predictions.sort((a, b) => b.confidence - a.confidence)[0];
+                                
+                                // Confidence lowered to 0.6 for better detection
+                                if(palm.confidence > 0.60) {
+                                    ctx.strokeStyle = "#00f2ff";
+                                    ctx.lineWidth = 4;
+                                    ctx.strokeRect(palm.bbox.x, palm.bbox.y, palm.bbox.width, palm.bbox.height);
+                                    startScan();
                                 }
                             }
                         });
@@ -219,23 +194,27 @@
                 });
         }
 
-        function startScan(seed) {
+        function startScan() {
             isAnalyzing = true;
             laser.style.display = "block";
-            statusLabel.innerHTML = "● අල්ලේ දත්ත පරීක්ෂා කරමින්...";
+            statusLabel.innerHTML = "● අල්ලේ රටා පරීක්ෂා කරමින්...";
+            statusLabel.style.color = "#ff0000";
             predictionBox.innerHTML = "කරුණාකර අල්ල නිසලව තබා ගන්න...";
 
             setTimeout(() => {
-                const fortuneIndex = seed % fortunes.length;
+                // Pick a truly random fortune
+                const fortuneIndex = Math.floor(Math.random() * fortunes.length);
                 predictionBox.innerHTML = fortunes[fortuneIndex];
                 statusLabel.innerHTML = "● විශ්ලේෂණය අවසන්";
+                statusLabel.style.color = var(--neon-cyan);
                 laser.style.display = "none";
                 
+                // Wait 8 seconds before allowing next scan
                 setTimeout(() => { 
                     isAnalyzing = false; 
                     statusLabel.innerHTML = "● පද්ධතිය සූදානම්";
                     predictionBox.innerHTML = "ඊළඟ පරීක්ෂාව සඳහා අල්ල පෙන්වන්න...";
-                }, 10000);
+                }, 8000);
             }, 4000);
         }
     </script>
