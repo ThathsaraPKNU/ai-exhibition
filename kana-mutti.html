@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>කිමේ පූර්ව AI කානාමුට්ටි 3 අභියෝගය</title>
+    <title>කිමේ පූර්ව AI කානාමුට්ටි 3 අභියෝගය (Realistic Edition)</title>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
     <style>
@@ -25,39 +25,51 @@
 
         video, canvas { position: absolute; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
 
-        .pot-wrapper { position: relative; z-index: 5; display: flex; flex-direction: column; align-items: center; margin-top: 15%; }
-        .rope { width: 3px; height: 50px; background: #654321; }
+        /* Realistic Pots & Rope Layout */
+        .pot-wrapper { 
+            position: relative; z-index: 5; display: flex; flex-direction: column; 
+            align-items: center; margin-top: 10%;
+            /* ලණුව සහ මුට්ටිය එකට සෙලවීම */
+            transform-origin: top center; 
+        }
+        
+        .rope { width: 4px; height: 70px; background: #654321; border-radius: 2px; }
+        
         .pot {
             width: 100px; height: 100px;
             background: url('muttiya.png') no-repeat center;
             background-size: contain; transition: 0.1s;
+            /* මුට්ටියේ ඉහළ කොටස ලණුවට සම්බන්ධ කිරීම */
+            margin-top: -5px; 
         }
-        .shaking { animation: shake 1s infinite ease-in-out; }
-        @keyframes shake { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
         
-        /* Water Splash Effect */
+        .shaking { animation: shake_realistic 1.2s infinite ease-in-out; }
+        @keyframes shake_realistic { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+        
+        /* Realistic Water Splash Effect */
         .splash {
-            position: absolute; top: 50px; width: 120px; height: 120px;
+            position: absolute; top: 100px; width: 150px; height: 150px;
             border-radius: 50%; display: none; pointer-events: none;
-            filter: blur(5px); animation: splashAnim 0.6s ease-out forwards;
+            filter: blur(8px); animation: splashAnim_realistic 0.8s ease-out forwards;
         }
-        @keyframes splashAnim {
-            0% { transform: scale(0.2); opacity: 1; }
-            100% { transform: scale(2); opacity: 0; }
+        @keyframes splashAnim_realistic {
+            0% { transform: scale(0.3) translateY(0); opacity: 1; }
+            50% { transform: scale(1.5) translateY(30px); opacity: 0.8; }
+            100% { transform: scale(2.5) translateY(60px); opacity: 0; }
         }
 
-        .broken { transform: scale(0); opacity: 0; transition: 0.4s; }
+        .broken { transform: scale(0); opacity: 0; transition: 0.5s ease-in; }
 
         #stick {
-            position: absolute; width: 12px; height: 180px;
+            position: absolute; width: 14px; height: 190px;
             background: linear-gradient(to top, #5d4037 0%, #ffcc00 100%);
-            border-radius: 6px; box-shadow: 0 0 15px var(--neon-gold);
+            border-radius: 8px; box-shadow: 0 0 20px var(--neon-gold);
             display: none; pointer-events: none; z-index: 100; transform-origin: center 90%; 
         }
 
         .ui-box { padding: 15px; text-align: center; z-index: 20; background: #000; width: 100%; flex-grow: 1; border-top: 2px solid #222;}
         #msg { font-size: 1.2rem; font-weight: bold; color: var(--neon-blue); }
-        .footer { font-size: 0.75rem; color: #666; margin-top: 5px; }
+        .footer { font-size: 0.8rem; color: #666; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -72,19 +84,19 @@
         <canvas id="output-canvas"></canvas>
         <div id="stick"></div>
         
-        <div class="pot-wrapper" id="wrap-0">
+        <div class="pot-wrapper shaking" id="wrap-0">
             <div class="rope"></div>
-            <div class="pot shaking" id="pot-0"></div>
+            <div class="pot" id="pot-0"></div>
             <div class="splash" id="splash-0"></div>
         </div>
-        <div class="pot-wrapper" id="wrap-1">
+        <div class="pot-wrapper shaking" id="wrap-1">
             <div class="rope"></div>
-            <div class="pot shaking" id="pot-1"></div>
+            <div class="pot" id="pot-1"></div>
             <div class="splash" id="splash-1"></div>
         </div>
-        <div class="pot-wrapper" id="wrap-2">
+        <div class="pot-wrapper shaking" id="wrap-2">
             <div class="rope"></div>
-            <div class="pot shaking" id="pot-2"></div>
+            <div class="pot" id="pot-2"></div>
             <div class="splash" id="splash-2"></div>
         </div>
     </div>
@@ -102,15 +114,16 @@
         let winningPot = Math.floor(Math.random() * 3); 
         let gameActive = true;
         let lastY = 0;
+        let canBreakPot = true; // Cool-down timer flag
 
         function onResults(results) {
-            if (!gameActive || !results.poseLandmarks) {
+            if (!gameActive || !canBreakPot || !results.poseLandmarks) {
                 if(!gameActive) stick.style.display = 'none';
                 return;
             }
 
             const wrist = results.poseLandmarks[16]; 
-            const elbow = landmarks = results.poseLandmarks[14]; 
+            const elbow = results.poseLandmarks[14]; 
 
             if (wrist && elbow) {
                 stick.style.display = 'block';
@@ -120,13 +133,15 @@
                 const ey = elbow.y * (window.innerHeight * 0.7);
 
                 const angle = (Math.atan2(y - ey, x - ex) * 180 / Math.PI) + 90;
-                stick.style.left = `${x - 6}px`;
-                stick.style.top = `${y - 160}px`;
+                stick.style.left = `${x - 7}px`;
+                stick.style.top = `${y - 170}px`;
                 stick.style.transform = `rotate(${angle}deg)`;
 
                 const velocity = y - lastY;
                 lastY = y;
 
+                // මුට්ටි 2ක් එකවර බිඳීම වැළැක්වීම (Find only one pot)
+                let potToBreak = -1;
                 for (let i = 0; i < 3; i++) {
                     const pot = document.getElementById(`pot-${i}`);
                     if (pot.classList.contains('broken')) continue;
@@ -134,31 +149,39 @@
                     const pr = pot.getBoundingClientRect();
                     const sr = stick.getBoundingClientRect();
 
-                    if (!(sr.right < pr.left || sr.left > pr.right || sr.bottom < pr.top || sr.top > pr.bottom) && velocity > 30) {
-                        handleBreak(i);
+                    if (!(sr.right < pr.left || sr.left > pr.right || sr.bottom < pr.top || sr.top > pr.bottom) && velocity > 32) {
+                        potToBreak = i;
+                        break; // Stop after finding the first pot
                     }
+                }
+
+                if (potToBreak !== -1) {
+                    canBreakPot = false; // Start cool-down
+                    handleBreak(potToBreak);
+                    setTimeout(() => { canBreakPot = true; }, 500); // Wait 0.5s before allowing next break
                 }
             }
         }
 
         function handleBreak(id) {
             const pot = document.getElementById(`pot-${id}`);
+            const wrap = document.getElementById(`wrap-${id}`);
             const splash = document.getElementById(`splash-${id}`);
             
             pot.classList.add('broken');
             splash.style.display = 'block';
 
             if (id === winningPot) {
-                // රතු වතුර (Red Water)
-                splash.style.background = 'radial-gradient(circle, #ff0000 0%, rgba(255,0,0,0) 70%)';
+                // රතු වතුර (Solid Red Water)
+                splash.style.background = 'radial-gradient(circle, #cc0000 0%, #ff0000 40%, rgba(255,0,0,0) 70%)';
                 gameActive = false;
-                msg.innerText = "🏆 සුපිරි! ඔබ රතු වතුර මුට්ටිය බිඳ ජයග්‍රහණය කළා! 🥇";
+                msg.innerText = "🏆 සුපිරි පහරක්! රතු වතුර මුට්ටිය බිඳ ජයග්‍රහණය කළා! 🥇";
                 msg.style.color = "#ff4d4d";
-                setTimeout(() => { if(confirm("Winner! නැවත සෙල්ලම් කරමුද?")) location.reload(); }, 3000);
+                setTimeout(() => { if(confirm("Winner! නැවත සෙල්ලම් කරමුද?")) location.reload(); }, 3500);
             } else {
-                // සාමාන්‍ය නිල් වතුර (Normal Blue Water)
-                splash.style.background = 'radial-gradient(circle, #00f2ff 0%, rgba(0,242,255,0) 70%)';
-                msg.innerText = "නිකන් වතුර! 💧 අනෙක් මුට්ටිය උත්සාහ කරන්න!";
+                // තද නිල් වතුර (Normal Blue Water)
+                splash.style.background = 'radial-gradient(circle, #00cccc 0%, #00f2ff 40%, rgba(0,242,255,0) 70%)';
+                msg.innerText = "💧 නිකන් වතුර! වාසනාව අනෙක් මුට්ටියේ වෙන්න ඇති!";
                 msg.style.color = "#00f2ff";
             }
         }
