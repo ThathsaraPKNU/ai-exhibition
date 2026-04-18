@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>කිමේ පූර්ව Online AI අවුරුදු ක්‍රීඩා 02 | Kanamutti</title>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
+    <style>
+        :root { --neon-blue: #00f2ff; --neon-pink: #ff007f; --dark: #050505; }
+        body { 
+            margin: 0; background: var(--dark); color: #fff; 
+            font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; 
+            align-items: center; overflow: hidden; height: 100vh;
+        }
+
+        /* Header Branding */
+        .header { text-align: center; padding: 15px; width: 100%; background: rgba(0,0,0,0.8); z-index: 10; }
+        .title { font-size: 1.5rem; color: var(--neon-blue); font-weight: 900; margin: 0; }
+        .sub-title { font-size: 0.9rem; color: #ccc; letter-spacing: 1px; }
+
+        #game-area {
+            position: relative; width: 100vw; height: 60vh;
+            display: flex; justify-content: center; align-items: center;
+            background: radial-gradient(circle, #111 0%, #000 100%);
+        }
+
+        #webcam { position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0.3; transform: scaleX(-1); }
+        #output-canvas { position: absolute; width: 100%; height: 100%; transform: scaleX(-1); }
+
+        /* Kanamutti Element */
+        #pot-container {
+            position: absolute; top: 20%; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .rope { width: 4px; height: 80px; background: #654321; }
+        #pot {
+            width: 120px; height: 120px;
+            background: url('https://cdn-icons-png.flaticon.com/512/3094/3094902.png') no-repeat center;
+            background-size: contain; transition: transform 0.1s;
+        }
+        .broken { animation: breakPot 0.5s forwards; }
+        @keyframes breakPot {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5) rotate(20deg); opacity: 0; }
+        }
+
+        /* Instructions */
+        .instruction-box {
+            background: rgba(0, 242, 255, 0.1); border: 1px solid var(--neon-blue);
+            padding: 15px; border-radius: 15px; margin: 10px; text-align: center;
+            width: 90%; max-width: 400px;
+        }
+
+        .footer-branding { margin-top: auto; padding: 20px; text-align: center; width: 100%; }
+        .footer-branding b { color: var(--neon-blue); }
+
+        #msg { font-size: 1.2rem; font-weight: bold; color: var(--neon-pink); min-height: 1.5em; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1 class="title">කිමේ පූර්ව Online AI අවුරුදු ක්‍රීඩා 02</h1>
+        <div class="sub-title">දකුණු කොරියාවේ ප්‍රථම වතාවට | KANAMUTTI BREAKING</div>
+    </div>
+
+    <div id="game-area">
+        <video id="webcam" autoplay playsinline></video>
+        <canvas id="output-canvas"></canvas>
+        
+        <div id="pot-container">
+            <div class="rope"></div>
+            <div id="pot"></div>
+        </div>
+    </div>
+
+    <div class="instruction-box">
+        <div id="msg">කැමරාවට අත පෙන්වන්න...</div>
+        <p style="font-size: 0.85rem; margin-top: 5px;">ස්පර්ශ නොකර, අත ඉහළ සිට පහළට වේගයෙන් හසුරුවා මුට්ටිය බිඳින්න!</p>
+    </div>
+
+    <div class="footer-branding">
+        POWERED BY <b>VECTOR LABS AI & E9 SHOP</b>
+    </div>
+
+    <script>
+        const videoElement = document.getElementById('webcam');
+        const canvasElement = document.getElementById('output-canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const pot = document.getElementById('pot');
+        const msg = document.getElementById('msg');
+
+        let lastWristY = 0;
+        let isBroken = false;
+
+        function onResults(results) {
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+            
+            if (results.poseLandmarks) {
+                // දකුණු අතේ මැණික් කටුව (Right Wrist - Landmark 16)
+                const wrist = results.poseLandmarks[16];
+                const currentY = wrist.y * canvasElement.height;
+
+                // සැබෑ ලෙසම පහර දෙන වේගය මැනීම (Velocity Check)
+                const velocity = currentY - lastWristY;
+
+                if (!isBroken) {
+                    msg.innerText = "දැන් පහර දෙන්න! ⚡";
+                    msg.style.color = "#00f2ff";
+
+                    // පහර දීම හඳුනාගැනීම (වේගය සහ පිහිටීම අනුව)
+                    if (velocity > 40 && wrist.y > 0.3 && wrist.y < 0.6) {
+                        breakPot();
+                    }
+                }
+                lastWristY = currentY;
+            }
+            canvasCtx.restore();
+        }
+
+        function breakPot() {
+            isBroken = true;
+            pot.classList.add('broken');
+            msg.innerText = "🎉 නියමයි! මුට්ටිය බිඳී ගියා! 🏆";
+            msg.style.color = "#39ff14";
+            
+            setTimeout(() => {
+                if(confirm("නැවත සෙල්ලම් කරමුද?")) {
+                    location.reload();
+                }
+            }, 1500);
+        }
+
+        const pose = new Pose({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+        });
+
+        pose.setOptions({
+            modelComplexity: 1,
+            smoothLandmarks: true,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+        });
+
+        pose.onResults(onResults);
+
+        const camera = new Camera(videoElement, {
+            onFrame: async () => {
+                await pose.send({image: videoElement});
+            },
+            width: 640,
+            height: 480
+        });
+        camera.start();
+
+        // Canvas ප්‍රමාණය සකස් කිරීම
+        window.addEventListener('resize', () => {
+            canvasElement.width = window.innerWidth;
+            canvasElement.height = window.innerHeight * 0.6;
+        });
+        window.dispatchEvent(new Event('resize'));
+
+    </script>
+</body>
+</html>
