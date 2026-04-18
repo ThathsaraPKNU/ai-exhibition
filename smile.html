@@ -2,146 +2,136 @@
 <html lang="si">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Smile Expert | 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>කිමේ AI සිනහව මැනීමේ පද්ධතිය</title>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.js" crossorigin="anonymous"></script>
     <style>
         :root {
             --neon-pink: #ff007f;
             --neon-blue: #00f2ff;
             --gold: #ffdd57;
-            --dark-bg: #050505;
+            --dark-bg: #080808;
+            --glass: rgba(255, 255, 255, 0.08);
         }
 
         body {
-            margin: 0;
-            background: var(--dark-bg);
-            color: #fff;
-            font-family: 'Segoe UI', 'Identity-Sinhala', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            margin: 0; background: var(--dark-bg); color: #fff;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            display: flex; flex-direction: column; align-items: center;
+            height: 100vh; overflow: hidden;
+            background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #080808 100%);
         }
 
-        /* Main Festival Header */
-        .main-header {
-            background: linear-gradient(90deg, #ffcc00, #ff9900);
-            color: #000;
-            width: 100%;
-            text-align: center;
-            padding: 12px 0;
-            font-weight: 900;
-            font-size: 22px;
-            text-transform: uppercase;
-            box-shadow: 0 4px 20px rgba(255, 204, 0, 0.5);
-            letter-spacing: 1px;
+        /* --- Attractive Splash Screen --- */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #050505 0%, #1a1a1a 100%);
+            z-index: 1000; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center;
+            text-align: center; padding: 20px; transition: 0.8s ease;
         }
 
-        .sub-header {
-            margin: 15px 0 5px 0;
-            font-size: 14px;
-            color: #ccc;
-            letter-spacing: 2px;
+        .splash-card {
+            background: var(--glass); backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            padding: 40px 30px; border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            animation: fadeInUp 1s ease;
         }
 
-        .highlight-title {
-            font-size: 19px;
-            color: var(--neon-blue);
-            text-align: center;
-            margin: 5px 15px 15px 15px;
-            font-weight: 700;
-            line-height: 1.4;
+        .splash-title { 
+            font-size: 2.2rem; color: var(--gold); font-weight: 900; 
+            margin: 0; text-shadow: 0 0 20px rgba(255, 221, 87, 0.4);
         }
 
-        /* Round Camera Viewport */
-        #viewport {
-            position: relative;
-            width: 260px;
-            height: 260px;
-            border-radius: 50%;
-            border: 6px solid var(--neon-blue);
-            overflow: hidden;
-            background: #000;
-            box-shadow: 0 0 40px rgba(0, 242, 255, 0.3);
+        .splash-sub { 
+            font-size: 1.1rem; color: var(--neon-blue); font-weight: 600; 
+            letter-spacing: 2px; margin-top: 10px; margin-bottom: 30px;
         }
 
-        video {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scaleX(-1);
+        .start-btn { 
+            padding: 18px 60px; background: linear-gradient(45deg, var(--neon-pink), #ff0055); 
+            color: #fff; border: none; border-radius: 50px; font-weight: 800; 
+            font-size: 1.2rem; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 0 25px rgba(255, 0, 127, 0.4);
+            animation: pulse 2s infinite;
         }
 
-        /* Results Area */
-        .result-container {
-            width: 85%;
-            margin-top: 20px;
+        /* --- Main UI Styling --- */
+        .app-header { 
+            width: 100%; background: linear-gradient(90deg, #ffcc00, #ff9900);
+            padding: 12px 0; text-align: center; color: #000;
+            font-weight: 900; font-size: 1.3rem; box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
+        }
+
+        .instruction-text {
+            color: var(--neon-blue); text-align: center; margin: 20px 15px;
+            font-size: 1.1rem; font-weight: 600; line-height: 1.4;
+        }
+
+        #viewport-container {
+            position: relative; width: 280px; height: 280px;
+            border-radius: 50%; border: 6px solid var(--neon-blue);
+            overflow: hidden; background: #000;
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.2);
+        }
+
+        video { position: absolute; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+
+        .result-card {
+            width: 85%; max-width: 400px; margin-top: 25px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            padding: 20px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.1);
             text-align: center;
         }
 
         #smile-percent {
-            font-size: 55px;
-            font-weight: 900;
-            color: var(--neon-pink);
-            text-shadow: 0 0 15px var(--neon-pink);
-            margin: 0;
+            font-size: 4rem; font-weight: 900; color: var(--neon-pink);
+            text-shadow: 0 0 20px var(--neon-pink); margin: 0;
         }
 
-        #message {
-            font-size: 18px;
-            color: var(--gold);
-            font-weight: bold;
-            margin-top: 5px;
-            min-height: 25px;
-        }
+        #message { font-size: 1.1rem; color: #ccc; font-weight: 600; margin-top: 5px; min-height: 1.5em; }
 
-        /* Branding Footer */
-        .footer-branding {
-            position: absolute;
-            bottom: 20px;
-            text-align: center;
-            width: 100%;
-        }
+        .branding-footer { margin-top: auto; padding-bottom: 25px; text-align: center; opacity: 0.7; }
+        .branding-footer b { color: var(--neon-blue); }
 
-        .presented-by {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        /* --- Animations --- */
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        .brand-logos {
-            font-size: 16px;
-            font-weight: bold;
-            color: #aaa;
-        }
-
-        .brand-logos span { color: var(--neon-blue); }
     </style>
 </head>
 <body>
 
-    <div class="main-header">🌸 කීමේ බක්මහ උළෙල - 2026 🌸</div>
-    
-    <div class="sub-header">AI EXPERT OPINION</div>
-    <div class="highlight-title">ඔබේ සිනහව කොච්චර වටිනවද? <br>අපේ AI විශේෂඥයාගෙන් අහලා බලමුද?</div>
+    <div id="splash-screen">
+        <div class="splash-card">
+            <h1 class="splash-title">කීමේ බක්මහ උළෙල</h1>
+            <div class="splash-sub">AI සිනහව මැනීමේ පද්ධතිය</div>
+            <button class="start-btn" onclick="startApp()">අරඹන්න 🚀</button>
+        </div>
+        <div style="margin-top: 40px; color: #555; font-size: 0.8rem; letter-spacing: 2px;">
+            VECTOR LABS AI & E9 SHOP
+        </div>
+    </div>
 
-    <div id="viewport">
+    <div class="app-header">🌸 කීමේ බක්මහ උළෙල - 2026 🌸</div>
+
+    <div class="instruction-text">
+        ඔබේ සිනහව කොච්චර වටිනවද? <br>අපේ AI විශේෂඥයාගෙන් අහලා බලමු!
+    </div>
+
+    <div id="viewport-container">
         <video id="webcam" autoplay playsinline></video>
     </div>
 
-    <div class="result-container">
+    <div class="result-card">
         <div id="smile-percent">0%</div>
         <div id="message">මුහුණ පෙන්වන්න...</div>
     </div>
 
-    <div class="footer-branding">
-        <div class="presented-by">Presented by</div>
-        <div class="brand-logos">VECTOR LABS AI <span>×</span> E9 SHOP</div>
+    <div class="branding-footer">
+        <div style="font-size: 0.7rem; color: #888; margin-bottom: 5px;">Presented by</div>
+        <div style="font-size: 0.9rem;"><b>VECTOR LABS AI</b> × <b>E9 SHOP</b></div>
     </div>
 
     <script type="module">
@@ -150,9 +140,16 @@
         const video = document.getElementById("webcam");
         const smilePercent = document.getElementById("smile-percent");
         const message = document.getElementById("message");
+        const splash = document.getElementById("splash-screen");
 
         let faceLandmarker;
         let lastVideoTime = -1;
+
+        window.startApp = async function() {
+            splash.style.opacity = '0';
+            setTimeout(() => splash.style.display = 'none', 800);
+            setupAI();
+        }
 
         async function setupAI() {
             try {
@@ -170,7 +167,7 @@
                 });
                 startCamera();
             } catch (e) {
-                message.innerText = "පද්ධතිය පණගැන්වීමේ දෝෂයකි.";
+                message.innerText = "පද්ධතිය සක්‍රීය කිරීමේ දෝෂයකි.";
             }
         }
 
@@ -192,10 +189,11 @@
                     const smileRight = shapes.find(s => s.categoryName === "mouthSmileRight").score;
                     
                     let smileScore = ((smileLeft + smileRight) / 2) * 100;
-                    // Scale it to make it more sensitive
-                    smileScore = Math.min(100, Math.max(0, smileScore * 1.4)); 
+                    smileScore = Math.min(100, Math.max(0, smileScore * 1.5)); 
 
                     updateUI(Math.round(smileScore));
+                } else {
+                    message.innerText = "කැමරාවට මුහුණ පෙන්වන්න...";
                 }
             }
             requestAnimationFrame(predictWebcam);
@@ -205,21 +203,19 @@
             smilePercent.innerText = score + "%";
 
             if (score < 15) {
-                message.innerText = "AI විශේෂඥයා බලන් ඉන්නවා... හිනාවෙන්න! 😊";
-                message.style.color = "#888";
+                message.innerText = "හිනාවෙන්න බලන්න! 😊";
+                message.style.color = "#ccc";
             } else if (score < 50) {
-                message.innerText = "ඔයාට මීට වඩා ලස්සනට හිනාවෙන්න පුළුවන්! 😍";
+                message.innerText = "තව ටිකක් ලස්සනට හිනාවෙන්න! 😍";
                 message.style.color = "#00f2ff";
             } else if (score < 85) {
-                message.innerText = "නියමයි! ඒක හරිම ආකර්ෂණීය සිනහවක්. 🌟";
+                message.innerText = "නියමයි! ඒක හරිම ආකර්ෂණීයයි. 🌟";
                 message.style.color = "#ffdd57";
             } else {
                 message.innerText = "විස්මිතයි! ඔබ තමයි අද දවසේ සිනහව රජා! 🏆";
                 message.style.color = "#ff007f";
             }
         }
-
-        setupAI();
     </script>
 </body>
 </html>
