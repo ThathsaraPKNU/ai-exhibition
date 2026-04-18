@@ -14,7 +14,7 @@
 
         body {
             margin: 0; background: var(--dark-bg); color: #fff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh; overflow-x: hidden;
         }
@@ -32,9 +32,7 @@
             padding: 18px 45px; background: var(--neon-cyan); color: #000; 
             border: none; border-radius: 40px; font-weight: bold; font-size: 1.2rem; 
             cursor: pointer; box-shadow: 0 0 20px var(--neon-cyan);
-            transition: transform 0.2s;
         }
-        .start-btn:active { transform: scale(0.95); }
 
         /* Mobile Camera Viewport */
         #viewport-container {
@@ -58,32 +56,21 @@
         }
         @keyframes scanMove { 0% { top: 0%; } 100% { top: 100%; } }
 
-        /* Prediction Result Section */
+        /* Prediction Result */
         .result-container { width: 90%; max-width: 400px; margin-top: 15px; }
-        #status-label { font-size: 13px; color: var(--neon-cyan); text-align: center; margin-bottom: 10px; font-weight: bold; letter-spacing: 1px; }
+        #status-label { font-size: 13px; color: var(--neon-cyan); text-align: center; margin-bottom: 10px; font-weight: bold; }
         #prediction-text {
             background: rgba(255, 221, 87, 0.05); border: 1.5px solid var(--neon-yellow);
             border-radius: 15px; padding: 20px; font-size: 19px;
             color: var(--neon-yellow); text-align: center; min-height: 80px; 
             font-weight: 600; display: flex; align-items: center; justify-content: center;
-            line-height: 1.5; box-shadow: inset 0 0 10px rgba(255, 221, 87, 0.1);
         }
 
-        /* 2. Highlighted Branding (අලියාට ඇස තැබීම හා සමානයි) */
-        .branding-section {
-            width: 100%; text-align: center; padding: 30px 10px; margin-top: auto;
-            background: linear-gradient(to bottom, transparent, rgba(255, 221, 87, 0.05));
-        }
-        .main-topic-highlight {
-            font-size: 2.3rem; color: var(--neon-yellow); font-weight: 900;
-            text-shadow: 0 0 15px rgba(255, 221, 87, 0.6); margin-bottom: 8px;
-        }
-        .powered-by {
-            font-size: 1rem; color: #aaa; letter-spacing: 2px; font-weight: 500;
-        }
-        .powered-by b { color: #fff; font-weight: 900; }
-
-        .disclaimer { font-style: italic; color: #555; font-size: 11px; margin-top: 15px; padding: 0 20px; line-height: 1.4; }
+        /* Branding Section */
+        .branding-section { width: 100%; text-align: center; padding: 30px 10px; margin-top: auto; }
+        .main-topic-highlight { font-size: 2.3rem; color: var(--neon-yellow); font-weight: 900; text-shadow: 0 0 15px rgba(255, 221, 87, 0.6); }
+        .powered-by { font-size: 1rem; color: #aaa; letter-spacing: 2px; }
+        .powered-by b { color: #fff; }
     </style>
 </head>
 <body>
@@ -92,7 +79,7 @@
         <div class="splash-title">කිමේ බක්මහ උළෙල - 2026</div>
         <div class="splash-sub">AI හස්ත රේඛා විද්‍යාගාරය</div>
         <button class="start-btn" onclick="startApp()">විශ්ලේෂණය අරඹන්න 🚀</button>
-        <div style="margin-top: 25px; font-size: 0.8rem; color: #444; letter-spacing: 1px;">VECTOR LABS AI & E9 SHOP</div>
+        <div style="margin-top: 25px; font-size: 0.8rem; color: #444;">VECTOR LABS AI & E9 SHOP</div>
     </div>
 
     <div id="viewport-container">
@@ -109,7 +96,6 @@
     <div class="branding-section">
         <div class="main-topic-highlight">කිමේ බක්මහ උළෙල - 2026</div>
         <div class="powered-by">POWERED BY <b>VECTOR LABS AI & E9 SHOP</b></div>
-        <div class="disclaimer">සටහන: මෙය විනෝදය සඳහා පමණක් ඉදිරිපත් කරන ලද්දකි. කෘතිම බුද්ධිය හරහා අල්ලේ රටා හඳුනාගැනීම තවමත් පර්යේෂණ මට්ටමේ පවතී.</div>
     </div>
 
     <script>
@@ -120,7 +106,6 @@
         const predictionBox = document.getElementById("prediction-text");
         const laser = document.getElementById("laser-line");
 
-        // 20 Unique Fortunes
         const fortunes = [
             "ඔබ ඉතාමත් වාසනාවන්තයෙක්. ඉදිරි කාලයේදී ඔබට නොසිතූ සුබ පණිවිඩයක් ලැබේවි! 💰",
             "ඔබේ කාරුණික ගතිගුණ නිසා නුදුරේදීම සමාජයෙන් ඉහළ පිළිගැනීමක් හිමිවේවි! 🌸",
@@ -147,14 +132,7 @@
         let isAnalyzing = false;
 
         function startApp() {
-            document.getElementById('splash-screen').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('splash-screen').style.display = 'none';
-                initCamera();
-            }, 500);
-        }
-
-        function initCamera() {
+            document.getElementById('splash-screen').style.display = 'none';
             navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
                 .then(stream => {
                     video.srcObject = stream;
@@ -163,9 +141,6 @@
                         canvas.height = video.videoHeight;
                         loadModel();
                     };
-                })
-                .catch(err => {
-                    predictionBox.innerHTML = "කැමරාව ක්‍රියාත්මක කිරීමට අවසර ලබා දෙන්න.";
                 });
         }
 
@@ -173,15 +148,12 @@
             roboflow.auth({ publishable_key: "rf_4tlgDCsTcah7rsFZTkKONHC3TXO2" })
                 .load({ model: "palm-detection-qvrsc", version: 2 })
                 .then(model => {
-                    statusLabel.innerHTML = "● පද්ධතිය සූදානම්";
                     setInterval(() => {
                         if (isAnalyzing) return;
                         model.detect(video).then(predictions => {
                             ctx.clearRect(0, 0, canvas.width, canvas.height);
                             if (predictions.length > 0) {
                                 let palm = predictions.sort((a, b) => b.confidence - a.confidence)[0];
-                                
-                                // Confidence lowered to 0.6 for better detection
                                 if(palm.confidence > 0.60) {
                                     ctx.strokeStyle = "#00f2ff";
                                     ctx.lineWidth = 4;
@@ -198,18 +170,13 @@
             isAnalyzing = true;
             laser.style.display = "block";
             statusLabel.innerHTML = "● අල්ලේ රටා පරීක්ෂා කරමින්...";
-            statusLabel.style.color = "#ff0000";
             predictionBox.innerHTML = "කරුණාකර අල්ල නිසලව තබා ගන්න...";
 
             setTimeout(() => {
-                // Pick a truly random fortune
                 const fortuneIndex = Math.floor(Math.random() * fortunes.length);
                 predictionBox.innerHTML = fortunes[fortuneIndex];
                 statusLabel.innerHTML = "● විශ්ලේෂණය අවසන්";
-                statusLabel.style.color = var(--neon-cyan);
                 laser.style.display = "none";
-                
-                // Wait 8 seconds before allowing next scan
                 setTimeout(() => { 
                     isAnalyzing = false; 
                     statusLabel.innerHTML = "● පද්ධතිය සූදානම්";
