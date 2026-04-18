@@ -7,161 +7,160 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
     <style>
-        :root { --neon-blue: #00f2ff; --neon-pink: #ff007f; --dark: #050505; }
+        :root { --neon-blue: #00f2ff; --neon-yellow: #ffcc00; --dark: #050505; }
         body { 
             margin: 0; background: var(--dark); color: #fff; 
             font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; 
             align-items: center; overflow: hidden; height: 100vh;
         }
 
-        /* Header Branding */
-        .header { text-align: center; padding: 15px; width: 100%; background: rgba(0,0,0,0.8); z-index: 10; }
-        .title { font-size: 1.5rem; color: var(--neon-blue); font-weight: 900; margin: 0; }
-        .sub-title { font-size: 0.9rem; color: #ccc; letter-spacing: 1px; }
+        /* Branding Header */
+        .header { text-align: center; padding: 15px; width: 100%; background: #000; border-bottom: 2px solid #222; }
+        .title { font-size: 1.4rem; color: var(--neon-yellow); font-weight: 900; margin: 0; }
 
         #game-area {
-            position: relative; width: 100vw; height: 60vh;
-            display: flex; justify-content: center; align-items: center;
-            background: radial-gradient(circle, #111 0%, #000 100%);
+            position: relative; width: 100vw; height: 65vh;
+            background: #000; overflow: hidden;
         }
 
-        #webcam { position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0.3; transform: scaleX(-1); }
-        #output-canvas { position: absolute; width: 100%; height: 100%; transform: scaleX(-1); }
+        video, canvas { 
+            position: absolute; width: 100%; height: 100%; 
+            object-fit: cover; transform: scaleX(-1); 
+        }
 
-        /* Kanamutti Element */
+        /* Kanamutti Animation */
         #pot-container {
-            position: absolute; top: 20%; left: 50%; transform: translateX(-50%);
-            display: flex; flex-direction: column; align-items: center;
+            position: absolute; top: 15%; left: 50%; transform: translateX(-50%);
+            z-index: 5; text-align: center;
         }
-        .rope { width: 4px; height: 80px; background: #654321; }
+        .rope { width: 4px; height: 60px; background: #8b4513; margin: 0 auto; }
         #pot {
-            width: 120px; height: 120px;
+            width: 100px; height: 100px;
             background: url('https://cdn-icons-png.flaticon.com/512/3094/3094902.png') no-repeat center;
-            background-size: contain; transition: transform 0.1s;
+            background-size: contain; transition: 0.1s;
         }
-        .broken { animation: breakPot 0.5s forwards; }
-        @keyframes breakPot {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(1.5) rotate(20deg); opacity: 0; }
+        .shaking { animation: shake 0.5s infinite; }
+        @keyframes shake { 0% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } 100% { transform: rotate(-5deg); } }
+        .broken { animation: break 0.6s forwards; }
+        @keyframes break { 0% { transform: scale(1); } 50% { transform: scale(1.3) rotate(15deg); opacity: 0.7; } 100% { transform: scale(0); opacity: 0; } }
+
+        /* Stick (පොල්ල) */
+        #stick {
+            position: absolute; width: 15px; height: 120px;
+            background: linear-gradient(to bottom, #ffcc00, #ff8800);
+            border-radius: 10px; border: 2px solid #fff;
+            box-shadow: 0 0 15px var(--neon-yellow);
+            display: none; pointer-events: none; z-index: 100;
+            transform-origin: center bottom;
         }
 
-        /* Instructions */
-        .instruction-box {
-            background: rgba(0, 242, 255, 0.1); border: 1px solid var(--neon-blue);
-            padding: 15px; border-radius: 15px; margin: 10px; text-align: center;
-            width: 90%; max-width: 400px;
-        }
-
-        .footer-branding { margin-top: auto; padding: 20px; text-align: center; width: 100%; }
-        .footer-branding b { color: var(--neon-blue); }
-
-        #msg { font-size: 1.2rem; font-weight: bold; color: var(--neon-pink); min-height: 1.5em; }
+        .ui-box { padding: 15px; text-align: center; z-index: 20; background: var(--dark); width: 100%; }
+        #msg { font-size: 1.2rem; font-weight: bold; color: var(--neon-blue); margin-bottom: 5px; }
+        .footer { font-size: 0.8rem; color: #777; padding-bottom: 10px; }
+        .footer b { color: #fff; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1 class="title">කිමේ පූර්ව Online AI අවුරුදු ක්‍රීඩා 02</h1>
-        <div class="sub-title">දකුණු කොරියාවේ ප්‍රථම වතාවට | KANAMUTTI BREAKING</div>
+        <div class="title">කිමේ පූර්ව Online AI අවුරුදු ක්‍රීඩා 02</div>
+        <div style="font-size: 0.8rem; color: #aaa;">ONLINE KANAMUTTI BREAKING</div>
     </div>
 
     <div id="game-area">
         <video id="webcam" autoplay playsinline></video>
         <canvas id="output-canvas"></canvas>
+        <div id="stick"></div>
         
         <div id="pot-container">
             <div class="rope"></div>
-            <div id="pot"></div>
+            <div id="pot" class="shaking"></div>
         </div>
     </div>
 
-    <div class="instruction-box">
-        <div id="msg">කැමරාවට අත පෙන්වන්න...</div>
-        <p style="font-size: 0.85rem; margin-top: 5px;">ස්පර්ශ නොකර, අත ඉහළ සිට පහළට වේගයෙන් හසුරුවා මුට්ටිය බිඳින්න!</p>
-    </div>
-
-    <div class="footer-branding">
-        POWERED BY <b>VECTOR LABS AI & E9 SHOP</b>
+    <div class="ui-box">
+        <div id="msg">කැමරාවට ඈතින් සිට අත පෙන්වන්න...</div>
+        <div class="footer">POWERED BY <b>VECTOR LABS AI & E9 SHOP</b></div>
     </div>
 
     <script>
         const videoElement = document.getElementById('webcam');
         const canvasElement = document.getElementById('output-canvas');
-        const canvasCtx = canvasElement.getContext('2d');
+        const stick = document.getElementById('stick');
         const pot = document.getElementById('pot');
         const msg = document.getElementById('msg');
-
-        let lastWristY = 0;
+        
         let isBroken = false;
+        let lastY = 0;
 
         function onResults(results) {
-            canvasCtx.save();
-            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-            
+            if (isBroken) return;
+
             if (results.poseLandmarks) {
-                // දකුණු අතේ මැණික් කටුව (Right Wrist - Landmark 16)
-                const wrist = results.poseLandmarks[16];
-                const currentY = wrist.y * canvasElement.height;
+                const wrist = results.poseLandmarks[16]; // දකුණු අතේ මැණික් කටුව
+                
+                // Stick එක අත ඇති ස්ථානයට ගෙන යාම (Mirroring නිවැරදි කර)
+                const x = (1 - wrist.x) * window.innerWidth;
+                const y = wrist.y * (window.innerHeight * 0.65);
+                
+                stick.style.display = 'block';
+                stick.style.left = `${x - 7}px`;
+                stick.style.top = `${y - 100}px`;
 
-                // සැබෑ ලෙසම පහර දෙන වේගය මැනීම (Velocity Check)
-                const velocity = currentY - lastWristY;
+                // වේගය මැනීම
+                const velocity = y - lastY;
+                lastY = y;
 
-                if (!isBroken) {
-                    msg.innerText = "දැන් පහර දෙන්න! ⚡";
-                    msg.style.color = "#00f2ff";
+                // ගැටීම පරීක්ෂා කිරීම (Collision Detection)
+                const potRect = pot.getBoundingClientRect();
+                const stickRect = stick.getBoundingClientRect();
 
-                    // පහර දීම හඳුනාගැනීම (වේගය සහ පිහිටීම අනුව)
-                    if (velocity > 40 && wrist.y > 0.3 && wrist.y < 0.6) {
-                        breakPot();
-                    }
+                const isHitting = !(stickRect.right < potRect.left || 
+                                    stickRect.left > potRect.right || 
+                                    stickRect.bottom < potRect.top || 
+                                    stickRect.top > potRect.bottom);
+
+                if (isHitting && velocity > 35) {
+                    breakPot();
                 }
-                lastWristY = currentY;
+
+                msg.innerText = "වේගයෙන් පහර දෙන්න! ⚡";
+            } else {
+                stick.style.display = 'none';
+                msg.innerText = "කැමරාවට අත පෙන්වන්න...";
             }
-            canvasCtx.restore();
         }
 
         function breakPot() {
             isBroken = true;
-            pot.classList.add('broken');
-            msg.innerText = "🎉 නියමයි! මුට්ටිය බිඳී ගියා! 🏆";
+            pot.className = "broken";
+            stick.style.display = 'none';
+            msg.innerText = "🎉 සුපිරි! ඔබ මුට්ටිය බිඳ දැමුවා! 🏆";
             msg.style.color = "#39ff14";
             
             setTimeout(() => {
-                if(confirm("නැවත සෙල්ලම් කරමුද?")) {
-                    location.reload();
-                }
-            }, 1500);
+                if(confirm("නැවත සෙල්ලම් කරමුද?")) location.reload();
+            }, 2000);
         }
 
         const pose = new Pose({
             locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
         });
 
-        pose.setOptions({
-            modelComplexity: 1,
-            smoothLandmarks: true,
-            minDetectionConfidence: 0.5,
-            minTrackingConfidence: 0.5
-        });
-
+        pose.setOptions({ modelComplexity: 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
         pose.onResults(onResults);
 
         const camera = new Camera(videoElement, {
-            onFrame: async () => {
-                await pose.send({image: videoElement});
-            },
-            width: 640,
-            height: 480
+            onFrame: async () => { await pose.send({image: videoElement}); },
+            width: 640, height: 480
         });
         camera.start();
 
-        // Canvas ප්‍රමාණය සකස් කිරීම
         window.addEventListener('resize', () => {
             canvasElement.width = window.innerWidth;
-            canvasElement.height = window.innerHeight * 0.6;
+            canvasElement.height = window.innerHeight * 0.65;
         });
         window.dispatchEvent(new Event('resize'));
-
     </script>
 </body>
 </html>
