@@ -3,23 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>කිමේ පූර්ව Online AI අවුරුදු ක්‍රීඩා 02 | Kanamutti</title>
+    <title>කිමේ පූර්ව AI කානාමුට්ටිය 02</title>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
     <style>
-        :root { --neon-blue: #00f2ff; --neon-yellow: #ffcc00; --dark: #050505; }
+        :root { --neon-gold: #ffcc00; --neon-blue: #00f2ff; --dark: #0a0a0a; }
         body { 
             margin: 0; background: var(--dark); color: #fff; 
             font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; 
             align-items: center; overflow: hidden; height: 100vh;
         }
 
-        /* Branding Header */
-        .header { text-align: center; padding: 15px; width: 100%; background: #000; border-bottom: 2px solid #222; }
-        .title { font-size: 1.4rem; color: var(--neon-yellow); font-weight: 900; margin: 0; }
+        .header { text-align: center; padding: 10px; width: 100%; background: #000; z-index: 50; }
+        .title { font-size: 1.2rem; color: var(--neon-gold); font-weight: 900; margin: 0; }
 
         #game-area {
-            position: relative; width: 100vw; height: 65vh;
+            position: relative; width: 100vw; height: 70vh;
             background: #000; overflow: hidden;
         }
 
@@ -28,43 +27,42 @@
             object-fit: cover; transform: scaleX(-1); 
         }
 
-        /* Kanamutti Animation */
+        /* Real Stick Look */
+        #stick {
+            position: absolute; width: 12px; height: 180px;
+            background: linear-gradient(to top, #5d4037 0%, #8d6e63 20%, #ffcc00 100%);
+            border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
+            display: none; pointer-events: none; z-index: 100;
+            /* අතින් අල්ලන තැන (Bottom) කේන්ද්‍රය ලෙස ගැනීම */
+            transform-origin: center 90%; 
+        }
+
         #pot-container {
-            position: absolute; top: 15%; left: 50%; transform: translateX(-50%);
+            position: absolute; top: 10%; left: 50%; transform: translateX(-50%);
             z-index: 5; text-align: center;
         }
-        .rope { width: 4px; height: 60px; background: #8b4513; margin: 0 auto; }
+        .rope { width: 3px; height: 50px; background: #555; margin: 0 auto; }
         #pot {
-            width: 100px; height: 100px;
+            width: 110px; height: 110px;
             background: url('https://cdn-icons-png.flaticon.com/512/3094/3094902.png') no-repeat center;
             background-size: contain; transition: 0.1s;
         }
-        .shaking { animation: shake 0.5s infinite; }
-        @keyframes shake { 0% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } 100% { transform: rotate(-5deg); } }
-        .broken { animation: break 0.6s forwards; }
-        @keyframes break { 0% { transform: scale(1); } 50% { transform: scale(1.3) rotate(15deg); opacity: 0.7; } 100% { transform: scale(0); opacity: 0; } }
+        .shaking { animation: shake 0.8s infinite ease-in-out; }
+        @keyframes shake { 0% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } 100% { transform: rotate(-8deg); } }
+        .broken { animation: break 0.5s forwards; }
+        @keyframes break { 0% { transform: scale(1); } 100% { transform: scale(0) rotate(45deg); opacity: 0; } }
 
-        /* Stick (පොල්ල) */
-        #stick {
-            position: absolute; width: 15px; height: 120px;
-            background: linear-gradient(to bottom, #ffcc00, #ff8800);
-            border-radius: 10px; border: 2px solid #fff;
-            box-shadow: 0 0 15px var(--neon-yellow);
-            display: none; pointer-events: none; z-index: 100;
-            transform-origin: center bottom;
-        }
-
-        .ui-box { padding: 15px; text-align: center; z-index: 20; background: var(--dark); width: 100%; }
-        #msg { font-size: 1.2rem; font-weight: bold; color: var(--neon-blue); margin-bottom: 5px; }
-        .footer { font-size: 0.8rem; color: #777; padding-bottom: 10px; }
-        .footer b { color: #fff; }
+        .ui-box { padding: 15px; text-align: center; z-index: 20; background: #000; width: 100%; flex-grow: 1; }
+        #msg { font-size: 1.1rem; font-weight: bold; color: var(--neon-blue); }
+        .footer { font-size: 0.75rem; color: #666; margin-top: 10px; letter-spacing: 1px; }
+        .footer b { color: #aaa; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <div class="title">කිමේ පූර්ව Online AI අවුරුදු ක්‍රීඩා 02</div>
-        <div style="font-size: 0.8rem; color: #aaa;">ONLINE KANAMUTTI BREAKING</div>
     </div>
 
     <div id="game-area">
@@ -79,13 +77,12 @@
     </div>
 
     <div class="ui-box">
-        <div id="msg">කැමරාවට ඈතින් සිට අත පෙන්වන්න...</div>
+        <div id="msg">කැමරාවට ටිකක් ඈතින් සිට අත පෙන්වන්න...</div>
         <div class="footer">POWERED BY <b>VECTOR LABS AI & E9 SHOP</b></div>
     </div>
 
     <script>
         const videoElement = document.getElementById('webcam');
-        const canvasElement = document.getElementById('output-canvas');
         const stick = document.getElementById('stick');
         const pot = document.getElementById('pot');
         const msg = document.getElementById('msg');
@@ -94,24 +91,38 @@
         let lastY = 0;
 
         function onResults(results) {
-            if (isBroken) return;
+            if (isBroken || !results.poseLandmarks) {
+                if(!isBroken) stick.style.display = 'none';
+                return;
+            }
 
-            if (results.poseLandmarks) {
-                const wrist = results.poseLandmarks[16]; // දකුණු අතේ මැණික් කටුව
-                
-                // Stick එක අත ඇති ස්ථානයට ගෙන යාම (Mirroring නිවැරදි කර)
-                const x = (1 - wrist.x) * window.innerWidth;
-                const y = wrist.y * (window.innerHeight * 0.65);
-                
+            const landmarks = results.poseLandmarks;
+            const wrist = landmarks[16]; // Right Wrist
+            const elbow = landmarks[14]; // Right Elbow
+
+            if (wrist && elbow) {
                 stick.style.display = 'block';
-                stick.style.left = `${x - 7}px`;
-                stick.style.top = `${y - 100}px`;
 
-                // වේගය මැනීම
-                const velocity = y - lastY;
-                lastY = y;
+                // පින්තූරය Mirror කර ඇති නිසා X අගය නිවැරදි කිරීම
+                const wristX = (1 - wrist.x) * window.innerWidth;
+                const wristY = wrist.y * (window.innerHeight * 0.7);
+                const elbowX = (1 - elbow.x) * window.innerWidth;
+                const elbowY = elbow.y * (window.innerHeight * 0.7);
 
-                // ගැටීම පරීක්ෂා කිරීම (Collision Detection)
+                // වැලමිටේ සිට මැණික් කටුවට ඇති කෝණය (Angle) ගණනය කිරීම
+                const angleRad = Math.atan2(wristY - elbowY, wristX - elbowX);
+                const angleDeg = (angleRad * 180 / Math.PI) + 90; // පොල්ල කෙලින් තබා ගැනීමට 90ක් එකතු කිරීම
+
+                // පොල්ල අතේ පිහිටුවීම
+                stick.style.left = `${wristX - 6}px`;
+                stick.style.top = `${wristY - 160}px`; // පොල්ල මැණික් කටුවෙන් උඩට මතුවන සේ
+                stick.style.transform = `rotate(${angleDeg}deg)`;
+
+                // වේගය පරීක්ෂාව
+                const velocity = wristY - lastY;
+                lastY = wristY;
+
+                // ගැටීම (Collision)
                 const potRect = pot.getBoundingClientRect();
                 const stickRect = stick.getBoundingClientRect();
 
@@ -120,14 +131,12 @@
                                     stickRect.bottom < potRect.top || 
                                     stickRect.top > potRect.bottom);
 
-                if (isHitting && velocity > 35) {
+                if (isHitting && velocity > 30) {
                     breakPot();
                 }
 
-                msg.innerText = "වේගයෙන් පහර දෙන්න! ⚡";
-            } else {
-                stick.style.display = 'none';
-                msg.innerText = "කැමරාවට අත පෙන්වන්න...";
+                msg.innerText = "සූදානම්... පහර දෙන්න! ⚡";
+                msg.style.color = "#00f2ff";
             }
         }
 
@@ -135,7 +144,7 @@
             isBroken = true;
             pot.className = "broken";
             stick.style.display = 'none';
-            msg.innerText = "🎉 සුපිරි! ඔබ මුට්ටිය බිඳ දැමුවා! 🏆";
+            msg.innerText = "🎉 සුපිරි පහරක්! මුට්ටිය බිඳී ගියා! 🏆";
             msg.style.color = "#39ff14";
             
             setTimeout(() => {
@@ -147,7 +156,7 @@
             locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
         });
 
-        pose.setOptions({ modelComplexity: 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+        pose.setOptions({ modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
         pose.onResults(onResults);
 
         const camera = new Camera(videoElement, {
@@ -157,8 +166,8 @@
         camera.start();
 
         window.addEventListener('resize', () => {
-            canvasElement.width = window.innerWidth;
-            canvasElement.height = window.innerHeight * 0.65;
+            document.getElementById('output-canvas').width = window.innerWidth;
+            document.getElementById('output-canvas').height = window.innerHeight * 0.7;
         });
         window.dispatchEvent(new Event('resize'));
     </script>
